@@ -9,7 +9,10 @@ import { MulterModule } from '@nestjs/platform-express';
 import { MulterConfig } from './common/config/multer.config';
 
 @Module({
-  imports: [UsersModule, ProjectsModule, BidsModule, MilestonesModule, SkillsModule, InvoicesModule, FilesModule, MessagesModule, AuthModule, TypeOrmModule.forRoot({
+  imports: [ConfigModule.forRoot({
+    isGlobal: true,
+    envFilePath: ['.env.development.local', '.env.development', '.env'],
+  }), TypeOrmModule.forRoot({
     type: 'postgres',
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT ?? '5432', 10),
@@ -18,10 +21,9 @@ import { MulterConfig } from './common/config/multer.config';
     database: process.env.DB_NAME,
     entities: [User, Project, Bid, Milestone, Skill, Invoice, UploadedFile, Message, LogoutLog],
     synchronize: true,
-
-  }), ConfigModule.forRoot(), MulterModule.registerAsync({
+  }), MulterModule.registerAsync({
     useClass: MulterConfig
-  })],
+  }), UsersModule, ProjectsModule, BidsModule, MilestonesModule, SkillsModule, InvoicesModule, FilesModule, MessagesModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

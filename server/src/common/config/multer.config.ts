@@ -8,12 +8,9 @@ export class MulterConfig implements MulterOptionsFactory {
             storage: multer.diskStorage({
                 destination: './uploads',
                 filename: (req, file, cb) => {
-                    if (!req.user) {
-                        return cb(new Error('User not authenticated'), '');
-                    }
-                    const userName = req.user.username;
+                    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
                     const ext = file.originalname.split('.').pop();
-                    const filename = `${file.fieldname}-${userName}.${ext}`;
+                    const filename = `${file.fieldname}-${uniqueSuffix}.${ext}`;
                     cb(null, filename);
                 }
             }),
