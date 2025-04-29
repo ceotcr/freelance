@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Like } from 'typeorm';
-import { User, UserRole } from './entities/user.entity';
+import { User, Skill } from 'src/exports/entities';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -9,8 +9,38 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private userRepository: Repository<User>,
+    @InjectRepository(Skill)
+    private skillRepository: Repository<Skill>,
   ) { }
+
+  async addSkill(userId: number, skillId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
+    if (!user) throw new NotFoundException('User not found');
+
+    const skill = await this.skillRepository.findOne({ where: { id: skillId } });
+    if (!skill) throw new NotFoundException('Skill not found');
+
+    user.skills.push(skill);
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async removeSkill(userId: number, skillId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
+    if (!user) throw new NotFoundException('User not found');
+
+    user.skills = user.skills.filter(skill => skill.id !== skillId);
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async getSkills(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
+    if (!user) throw new NotFoundException('User not found');
+
+    return user.skills;
+  }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findOne({
