@@ -1,26 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UploadedFile } from 'src/exports/entities';
+import { ExtendedCreateFileDto } from './dto/create-file.dto';
 
 @Injectable()
 export class FilesService {
-  create(createFileDto: CreateFileDto) {
-    return 'This action adds a new file';
+  constructor(
+    @InjectRepository(UploadedFile)
+    private readonly uploadedFileRepository: Repository<UploadedFile>,
+  ) { }
+
+  async create(createUploadedFileDto: ExtendedCreateFileDto): Promise<UploadedFile> {
+    const uploadedFile = this.uploadedFileRepository.create(createUploadedFileDto);
+    return this.uploadedFileRepository.save(uploadedFile);
   }
 
-  findAll() {
-    return `This action returns all files`;
+  async findAll(): Promise<UploadedFile[]> {
+    return this.uploadedFileRepository.find({ relations: ['user', 'project'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
+  async findOne(id: number): Promise<UploadedFile> {
+    const file = await this.uploadedFileRepository.findOne({ where: { id }, relations: ['user', 'project'] });
+    if (!file) {
+      throw new NotFoundException(`File with id ${id} not found`);
+    }
+    return file;
   }
 
-  update(id: number, updateFileDto: UpdateFileDto) {
-    return `This action updates a #${id} file`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+  async remove(id: number): Promise<void> {
+    const file = await this.findOne(id);
+    await this.uploadedFileRepository.remove(file);
   }
 }

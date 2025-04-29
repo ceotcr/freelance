@@ -1,34 +1,50 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FilesService } from './files.service';
+import { Controller, Post, Get, Delete, Param, UploadedFile as MulterUploadedFile, UseInterceptors, Body, ParseIntPipe, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { extname } from 'path';
+import { FilesService } from './files.service';
 
-@Controller('files')
-export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+@Controller('uploaded-files')
+export class UploadedFilesController {
+  constructor(private readonly uploadedFilesService: FilesService) { }
 
   @Post()
-  create(@Body() createFileDto: CreateFileDto) {
-    return this.filesService.create(createFileDto);
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + extname(file.originalname));
+      }
+    })
+  }))
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: CreateFileDto,
+  ) {
+    const createUploadedFileDto = {
+      fileName: file.originalname,
+      fileUrl: `/uploads/${file.filename}`,
+      userId: body.userId,
+      projectId: body.projectId ?? undefined,
+    };
+
+    return this.uploadedFilesService.create(createUploadedFileDto);
   }
 
   @Get()
-  findAll() {
-    return this.filesService.findAll();
+  async findAll() {
+    return this.uploadedFilesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-    return this.filesService.update(+id, updateFileDto);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.uploadedFilesService.findOne(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.filesService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.uploadedFilesService.remove(id);
   }
 }

@@ -24,14 +24,17 @@ export class User {
     @Column()
     lastName: string;
 
-    @Column()
+    @Column({ unique: true })
     username: string;
 
-    @Column()
+    @Column({ nullable: true, default: null })
     profilePicture: string;
 
     @Column({ unique: true })
     email: string;
+
+    @Column({ nullable: true, default: null, type: 'text' })
+    bio: string;
 
     @Column()
     password: string;
@@ -62,5 +65,5 @@ export class User {
     skills: Skill[];
 
     @OneToOne(() => LogoutLog, logoutLog => logoutLog.user, { cascade: true })
-    logoutLogs: LogoutLog;
+    logoutLog: LogoutLog;
 }
