@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
-import { ACCESS_TOKEN_COOKIE_EXPIRATION, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
+import { ACCESS_TOKEN_COOKIE_EXPIRATION, JWT_SECRET, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
 
 @Injectable()
 export class AuthService {
@@ -30,10 +30,10 @@ export class AuthService {
 
         res.cookie('access_token', access_token, { httpOnly: true, secure: true, expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
         res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: true, expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
-        return {
+        return res.status(200).json({
             access_token,
             refresh_token
-        };
+        });
     }
 
     async register({
@@ -58,6 +58,7 @@ export class AuthService {
         }
     }
     async logout({ userAgent, ipAddress, res, req }: { userAgent: string; ipAddress: string; res: Response; req: Request }) {
+        console.log(req.user)
         if (!req.user) {
             throw new UnauthorizedException('User not found');
         }
@@ -66,11 +67,13 @@ export class AuthService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        const logoutLog = this.logoutLogRepository.create({ user, userAgent, ipAddress });
+        const logoutLog = this.logoutLogRepository.create({ user, userAgent, ipAddress, logoutTime: new Date() });
         await this.logoutLogRepository.save(logoutLog);
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
-        return { message: 'Logged out successfully' };
+        return res.status(200).json({
+            message: 'Logged out successfully',
+        });
     }
 
     async validateTokenAgainstLogout(userId: number, tokenIat: number) {

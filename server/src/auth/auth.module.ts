@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LogoutLog, User } from 'src/exports/entities';
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_SECRET } from 'src/common/constants/jwt.constants';
+import { JwtStrategy } from './strategies/jwt-auth.strategy';
 
 @Module({
   imports: [UsersModule, TypeOrmModule.forFeature([User, LogoutLog]), JwtModule.register({
@@ -14,6 +15,6 @@ import { JWT_SECRET } from 'src/common/constants/jwt.constants';
     signOptions: { expiresIn: '15m' },
   })],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule { }

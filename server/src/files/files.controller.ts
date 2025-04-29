@@ -6,7 +6,7 @@ import { extname } from 'path';
 import { FilesService } from './files.service';
 
 @Controller('uploaded-files')
-export class UploadedFilesController {
+export class FilesController {
   constructor(private readonly uploadedFilesService: FilesService) { }
 
   @Post()

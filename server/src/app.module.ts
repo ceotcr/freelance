@@ -7,11 +7,12 @@ import { AuthModule, BidsModule, FilesModule, InvoicesModule, MessagesModule, Mi
 import { Bid, Invoice, LogoutLog, Message, Milestone, Project, Skill, User, UploadedFile } from './exports/entities';
 import { MulterModule } from '@nestjs/platform-express';
 import { MulterConfig } from './common/config/multer.config';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
-    envFilePath: ['.env.development.local', '.env.development', '.env'],
+    envFilePath: ['.env'],
   }), TypeOrmModule.forRoot({
     type: 'postgres',
     host: process.env.DB_HOST,
@@ -25,6 +26,6 @@ import { MulterConfig } from './common/config/multer.config';
     useClass: MulterConfig
   }), UsersModule, ProjectsModule, BidsModule, MilestonesModule, SkillsModule, InvoicesModule, FilesModule, MessagesModule, AuthModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtAuthGuard]
 })
 export class AppModule { }

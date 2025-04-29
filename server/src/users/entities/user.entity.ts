@@ -65,5 +65,5 @@ export class User {
     skills: Skill[];
 
     @OneToMany(() => LogoutLog, logoutLog => logoutLog.user, { cascade: true })
-    logoutLog: LogoutLog;
+    logoutLogs: LogoutLog;
 }
