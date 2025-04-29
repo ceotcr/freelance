@@ -79,7 +79,7 @@ export class UsersService {
       order: {
         [sortBy]: sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
       },
-      relations: ['skills'], // add relations as needed
+      relations: ['skills'],
     });
 
     return { data, total };
@@ -93,6 +93,17 @@ export class UsersService {
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return user;
+  }
+  async getUserByUserName(username: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { username },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
     }
 
     return user;

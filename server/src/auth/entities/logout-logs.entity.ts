@@ -1,12 +1,13 @@
 import { User } from 'src/users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeorm';
 
 @Entity()
+@Unique(['user', 'userAgent', 'ipAddress'])
 export class LogoutLog {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User, { eager: true })
+    @ManyToOne(() => User, { eager: true })
     user: User;
 
     @Column()

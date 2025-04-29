@@ -1,4 +1,85 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { LogoutLog } from 'src/exports/entities';
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { Request, Response } from 'express';
+import { ACCESS_TOKEN_COOKIE_EXPIRATION, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
 
 @Injectable()
-export class AuthService { }
+export class AuthService {
+    constructor(private readonly usersService: UsersService, @InjectRepository(LogoutLog) private readonly logoutLogRepository: Repository<LogoutLog>,
+        private readonly jwtService: JwtService
+    ) { }
+
+    async login({ username, password }: LoginDto, res: Response) {
+        const user = await this.usersService.getUserByUserName(username);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new UnauthorizedException('Invalid password');
+        }
+
+        const payload = { username: user.username, role: user.role, sub: user.id };
+
+        const access_token = this.jwtService.sign(payload, { expiresIn: '15m' });
+        const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+        res.cookie('access_token', access_token, { httpOnly: true, secure: true, expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
+        res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: true, expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
+        return {
+            access_token,
+            refresh_token
+        };
+    }
+
+    async register({
+        username,
+        password,
+        role,
+        firstName,
+        lastName,
+        email,
+    }: RegisterDto) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await this.usersService.create({
+            username,
+            password: hashedPassword,
+            role,
+            firstName,
+            lastName,
+            email,
+        });
+        return {
+            message: 'User registered successfully',
+        }
+    }
+    async logout({ userAgent, ipAddress, res, req }: { userAgent: string; ipAddress: string; res: Response; req: Request }) {
+        if (!req.user) {
+            throw new UnauthorizedException('User not found');
+        }
+        const userId = req.user['id'];
+        const user = await this.usersService.findOne(userId);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        const logoutLog = this.logoutLogRepository.create({ user, userAgent, ipAddress });
+        await this.logoutLogRepository.save(logoutLog);
+        res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
+        return { message: 'Logged out successfully' };
+    }
+
+    async validateTokenAgainstLogout(userId: number, tokenIat: number) {
+        const latestLogout = await this.logoutLogRepository.findOne({
+            where: { user: { id: userId } },
+            order: { logoutTime: 'DESC' },
+        });
+        if (latestLogout && latestLogout.logoutTime.getTime() / 1000 > tokenIat) {
+            throw new UnauthorizedException('Token invalid due to logout.');
+        }
+    }
+}

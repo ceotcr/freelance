@@ -1,0 +1,3 @@
+export const JWT_SECRET = process.env.JWT_SECRET
+export const ACCESS_TOKEN_COOKIE_EXPIRATION = 15 * 60 * 1000
+export const REFRESH_TOKEN_COOKIE_EXPIRATION = 7 * 24 * 60 * 60 * 1000

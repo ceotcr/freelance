@@ -4,7 +4,7 @@ import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Message } from 'src/messages/entities/message.entity';
 import { Project } from 'src/projects/entities/project.entity';
 import { Skill } from 'src/skills/entities/skill.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { UploadedFile } from 'src/files/entities/file.entity';
 
 export enum UserRole {
@@ -64,6 +64,6 @@ export class User {
     @JoinTable()
     skills: Skill[];
 
-    @OneToOne(() => LogoutLog, logoutLog => logoutLog.user, { cascade: true })
+    @OneToMany(() => LogoutLog, logoutLog => logoutLog.user, { cascade: true })
     logoutLog: LogoutLog;
 }
