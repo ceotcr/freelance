@@ -75,6 +75,7 @@ export class BidsService {
         { id: bid.project.id },
         { status: 'in_progress' },
       );
+      await this.rejectOtherBids(bid.project.id, bid.id);
     }
     return await this.bidRepository.save(updated);
   }
