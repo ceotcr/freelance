@@ -8,8 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
-import { ACCESS_TOKEN_COOKIE_EXPIRATION, JWT_SECRET, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
-import { profile } from 'console';
+import { ACCESS_TOKEN_COOKIE_EXPIRATION, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
 
 @Injectable()
 export class AuthService {

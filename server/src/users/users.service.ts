@@ -14,34 +14,6 @@ export class UsersService {
     private skillRepository: Repository<Skill>,
   ) { }
 
-  async addSkill(userId: number, skillId: number) {
-    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
-    if (!user) throw new NotFoundException('User not found');
-
-    const skill = await this.skillRepository.findOne({ where: { id: skillId } });
-    if (!skill) throw new NotFoundException('Skill not found');
-
-    user.skills.push(skill);
-    await this.userRepository.save(user);
-    return user;
-  }
-
-  async removeSkill(userId: number, skillId: number) {
-    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
-    if (!user) throw new NotFoundException('User not found');
-
-    user.skills = user.skills.filter(skill => skill.id !== skillId);
-    await this.userRepository.save(user);
-    return user;
-  }
-
-  async getSkills(userId: number) {
-    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['skills'] });
-    if (!user) throw new NotFoundException('User not found');
-
-    return user.skills;
-  }
-
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findOne({
       where: [{ username: createUserDto.username }, { email: createUserDto.email }],
@@ -103,6 +75,7 @@ export class UsersService {
 
     return user;
   }
+
   async getUserByUserName(username: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { username },
@@ -126,10 +99,5 @@ export class UsersService {
     }
     const { password, ...woutPswd } = await this.userRepository.save(user)
     return woutPswd
-  }
-
-  async remove(id: number): Promise<void> {
-    const user = await this.findOne(id);
-    await this.userRepository.remove(user);
   }
 }
