@@ -12,11 +12,6 @@ export class BidsController {
     return this.bidsService.create(createBidDto);
   }
 
-  @Get()
-  async findAll(@Query() query: any) {
-    return this.bidsService.findAll(query);
-  }
-
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bidsService.findOne(id);

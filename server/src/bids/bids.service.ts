@@ -1,48 +1,59 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Bid } from './entities/bid.entity';
 import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
+import { User } from '../users/entities/user.entity';
+import { Project } from '../projects/entities/project.entity';
 
 @Injectable()
 export class BidsService {
   constructor(
     @InjectRepository(Bid)
     private readonly bidRepository: Repository<Bid>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
   ) { }
 
   async create(createBidDto: CreateBidDto): Promise<Bid> {
-    const bid = this.bidRepository.create(createBidDto);
-    return this.bidRepository.save(bid);
-  }
+    const freelancer = await this.userRepository.findOneBy({ id: createBidDto.freelancerId });
+    if (!freelancer) {
+      throw new NotFoundException('Freelancer not found');
+    }
 
-  async findAll(query: any): Promise<{ data: Bid[]; total: number }> {
-    const {
-      page = 1,
-      limit = 10,
-      freelancerId,
-      projectId,
-      sortBy = 'createdAt',
-      sortOrder = 'DESC',
-    } = query;
+    const project = await this.projectRepository.findOneBy({ id: createBidDto.projectId });
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
 
-    const where: FindOptionsWhere<Bid> = {};
-
-    if (freelancerId) where.freelancer = { id: freelancerId };
-    if (projectId) where.project = { id: projectId };
-
-    const [data, total] = await this.bidRepository.findAndCount({
-      where,
-      take: +limit,
-      skip: (+page - 1) * +limit,
-      order: {
-        [sortBy]: sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
-      },
-      relations: ['freelancer', 'project'],
+    const bid = this.bidRepository.create({
+      amount: createBidDto.amount,
+      proposal: createBidDto.proposal,
+      freelancer,
+      project,
+      status: 'pending',
     });
 
-    return { data, total };
+    return await this.bidRepository.save(bid);
+  }
+
+  async findByProject(projectId: number): Promise<Bid[]> {
+    return this.bidRepository.find({
+      where: { project: { id: projectId } },
+      relations: ['freelancer', 'project'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findByFreelancer(freelancerId: number): Promise<Bid[]> {
+    return this.bidRepository.find({
+      where: { freelancer: { id: freelancerId } },
+      relations: ['freelancer', 'project'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: number): Promise<Bid> {
@@ -50,20 +61,23 @@ export class BidsService {
       where: { id },
       relations: ['freelancer', 'project'],
     });
-
     if (!bid) {
-      throw new NotFoundException(`Bid with id ${id} not found`);
+      throw new NotFoundException('Bid not found');
     }
-
     return bid;
   }
 
   async update(id: number, updateBidDto: UpdateBidDto): Promise<Bid> {
     const bid = await this.findOne(id);
+    const updated = this.bidRepository.merge(bid, updateBidDto);
+    return await this.bidRepository.save(updated);
+  }
 
-    Object.assign(bid, updateBidDto);
-
-    return this.bidRepository.save(bid);
+  async rejectOtherBids(projectId: number, acceptedBidId: number): Promise<void> {
+    await this.bidRepository.update(
+      { project: { id: projectId }, id: Not(acceptedBidId) },
+      { status: 'rejected' },
+    );
   }
 
   async remove(id: number): Promise<void> {

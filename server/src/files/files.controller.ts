@@ -34,11 +34,6 @@ export class FilesController {
     return this.uploadedFilesService.create(createUploadedFileDto);
   }
 
-  @Get()
-  async findAll() {
-    return this.uploadedFilesService.findAll();
-  }
-
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.uploadedFilesService.findOne(id);

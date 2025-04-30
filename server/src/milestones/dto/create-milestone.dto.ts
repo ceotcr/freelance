@@ -1,18 +1,15 @@
-// dto/create-milestone.dto.ts
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import { MilestoneStatus } from '../entities/milestone.entity';
+import { IsString, IsNumber, IsNotEmpty, Min, IsInt } from 'class-validator';
 
 export class CreateMilestoneDto {
+    @IsString()
     @IsNotEmpty()
     title: string;
 
     @IsNumber()
+    @Min(0)
     amount: number;
 
-    @IsOptional()
-    @IsEnum(MilestoneStatus)
-    status?: MilestoneStatus;
-
-    @IsNotEmpty()
+    @IsInt()
+    @Min(1)
     projectId: number;
 }

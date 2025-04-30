@@ -1,9 +1,9 @@
-export * from '../../users/users.module';
-export * from '../../projects/projects.module';
-export * from '../../bids/bids.module';
-export * from '../../milestones/milestones.module';
-export * from '../../skills/skills.module';
-export * from '../../invoices/invoices.module';
-export * from '../../files/files.module';
-export * from '../../messages/messages.module';
-export * from '../../auth/auth.module';
+export { UsersModule } from '../../users/users.module';
+export { ProjectsModule } from '../../projects/projects.module';
+export { BidsModule } from '../../bids/bids.module';
+export { MilestonesModule } from '../../milestones/milestones.module';
+export { SkillsModule } from '../../skills/skills.module';
+export { InvoicesModule } from '../../invoices/invoices.module';
+export { FilesModule } from '../../files/files.module';
+export { MessagesModule } from '../../messages/messages.module';
+export { AuthModule } from '../../auth/auth.module';

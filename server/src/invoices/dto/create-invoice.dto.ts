@@ -1,16 +1,15 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, Min, IsInt } from 'class-validator';
 
 export class CreateInvoiceDto {
     @IsNumber()
+    @Min(0)
     amount: number;
 
-    @IsString()
-    @IsOptional()
-    status?: string; // unpaid, paid, overdue
-
-    @IsNotEmpty()
-    freelancerId: number;
-
-    @IsNotEmpty()
+    @IsInt()
+    @Min(1)
     projectId: number;
+
+    @IsInt()
+    @Min(1)
+    freelancerId: number;
 }

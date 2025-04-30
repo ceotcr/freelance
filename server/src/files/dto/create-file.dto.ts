@@ -1,16 +1,19 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, Min, IsOptional } from 'class-validator';
 
 export class CreateFileDto {
-    @IsNumber()
+    @IsString()
+    @IsNotEmpty()
+    fileName: string;
+
+    @IsString()
+    @IsNotEmpty()
+    fileUrl: string;
+
+    @IsInt()
+    @IsNotEmpty()
     userId: number;
 
-    @IsOptional()
-    @IsNumber()
-    projectId?: number;
-}
-
-
-export class ExtendedCreateFileDto extends CreateFileDto {
-    fileName: string;
-    fileUrl: string;
+    @IsInt()
+    @IsNotEmpty()
+    projectId: number;
 }

@@ -1,16 +1,19 @@
-// dto/create-project.dto.ts
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, Min, Max } from 'class-validator';
 
 export class CreateProjectDto {
+    @IsString()
     @IsNotEmpty()
     title: string;
 
+    @IsString()
     @IsNotEmpty()
     description: string;
 
-    @IsNumber()
-    budget: number;
+    @IsString()
+    status: 'open' | 'in_progress' | 'completed' | 'cancelled';
 
-    @IsOptional()
-    clientId?: number;
+    @IsNumber()
+    @Min(0)
+    @Max(1000000)
+    budget: number;
 }

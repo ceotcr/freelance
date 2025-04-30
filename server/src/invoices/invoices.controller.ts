@@ -12,11 +12,6 @@ export class InvoicesController {
     return this.invoicesService.create(createInvoiceDto);
   }
 
-  @Get()
-  async findAll(@Query() query: any) {
-    return this.invoicesService.findAll(query);
-  }
-
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.invoicesService.findOne(id);

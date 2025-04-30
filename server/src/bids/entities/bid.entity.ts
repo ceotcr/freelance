@@ -13,6 +13,9 @@ export class Bid {
     @Column('text')
     proposal: string;
 
+    @Column({ type: 'enum', enum: ['pending', 'accepted', 'rejected'], default: 'pending' })
+    status: 'pending' | 'accepted' | 'rejected';
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 

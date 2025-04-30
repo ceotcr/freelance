@@ -20,6 +20,9 @@ export class Project {
     @Column({ type: 'decimal' })
     budget: number;
 
+    @Column({ type: 'enum', enum: ['open', 'in_progress', 'completed', 'cancelled'], default: 'open' })
+    status: 'open' | 'in_progress' | 'completed' | 'cancelled';
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     postedAt: Date;
 

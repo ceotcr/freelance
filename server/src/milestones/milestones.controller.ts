@@ -8,27 +8,31 @@ export class MilestonesController {
   constructor(private readonly milestonesService: MilestonesService) { }
 
   @Post()
-  async create(@Body() createMilestoneDto: CreateMilestoneDto) {
+  create(@Body() createMilestoneDto: CreateMilestoneDto) {
     return this.milestonesService.create(createMilestoneDto);
   }
 
   @Get()
-  async findAll(@Query() query: any) {
-    return this.milestonesService.findAll(query);
+  findAll(@Query('projectId', ParseIntPipe) projectId: number) {
+    return this.milestonesService.findByProject(projectId);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.milestonesService.findOne(id);
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateMilestoneDto: UpdateMilestoneDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateMilestoneDto: UpdateMilestoneDto) {
     return this.milestonesService.update(id, updateMilestoneDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.milestonesService.remove(id);
+  }
+  @Get('status/:id')
+  findStatus(@Param('id', ParseIntPipe) id: number) {
+    return this.milestonesService.findOne(id);
   }
 }

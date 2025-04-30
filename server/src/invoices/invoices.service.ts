@@ -1,50 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Invoice } from './entities/invoice.entity';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { User } from '../users/entities/user.entity';
+import { Project } from '../projects/entities/project.entity';
 
 @Injectable()
 export class InvoicesService {
   constructor(
     @InjectRepository(Invoice)
     private readonly invoiceRepository: Repository<Invoice>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
   ) { }
 
   async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
-    const invoice = this.invoiceRepository.create(createInvoiceDto);
-    return this.invoiceRepository.save(invoice);
-  }
+    const freelancer = await this.userRepository.findOneBy({ id: createInvoiceDto.freelancerId });
+    if (!freelancer) {
+      throw new NotFoundException('Freelancer not found');
+    }
 
-  async findAll(query: any): Promise<{ data: Invoice[]; total: number }> {
-    const {
-      page = 1,
-      limit = 10,
-      projectId,
-      freelancerId,
-      status,
-      sortBy = 'id',
-      sortOrder = 'DESC',
-    } = query;
+    const project = await this.projectRepository.findOneBy({ id: createInvoiceDto.projectId });
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
 
-    const where: FindOptionsWhere<Invoice> = {};
-
-    if (projectId) where.project = { id: projectId };
-    if (freelancerId) where.freelancer = { id: freelancerId };
-    if (status) where.status = status;
-
-    const [data, total] = await this.invoiceRepository.findAndCount({
-      where,
-      take: +limit,
-      skip: (+page - 1) * +limit,
-      order: {
-        [sortBy]: sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
-      },
-      relations: ['freelancer', 'project'],
+    const invoice = this.invoiceRepository.create({
+      amount: createInvoiceDto.amount,
+      status: 'unpaid',
+      issuedAt: new Date(),
+      freelancer,
+      project,
     });
 
-    return { data, total };
+    return await this.invoiceRepository.save(invoice);
+  }
+
+  async findByProject(projectId: number): Promise<Invoice[]> {
+    return this.invoiceRepository.find({
+      where: { project: { id: projectId } },
+      relations: ['freelancer', 'project'],
+    });
+  }
+
+  async findByFreelancer(freelancerId: number): Promise<Invoice[]> {
+    return this.invoiceRepository.find({
+      where: { freelancer: { id: freelancerId } },
+      relations: ['freelancer', 'project'],
+    });
   }
 
   async findOne(id: number): Promise<Invoice> {
@@ -52,20 +59,20 @@ export class InvoicesService {
       where: { id },
       relations: ['freelancer', 'project'],
     });
-
     if (!invoice) {
-      throw new NotFoundException(`Invoice with id ${id} not found`);
+      throw new NotFoundException('Invoice not found');
     }
-
     return invoice;
   }
 
   async update(id: number, updateInvoiceDto: UpdateInvoiceDto): Promise<Invoice> {
     const invoice = await this.findOne(id);
+    const updated = this.invoiceRepository.merge(invoice, updateInvoiceDto);
+    return await this.invoiceRepository.save(updated);
+  }
 
-    Object.assign(invoice, updateInvoiceDto);
-
-    return this.invoiceRepository.save(invoice);
+  async markAsPaid(id: number): Promise<Invoice> {
+    return this.update(id, { status: 'paid' });
   }
 
   async remove(id: number): Promise<void> {
