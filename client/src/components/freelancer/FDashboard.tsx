@@ -12,6 +12,7 @@ import { getProjectFiles } from "../../helpers/files/api";
 import { getMilestones } from "../../helpers/milestones/apis";
 import { getMyProjects } from "../../helpers/projects/apis";
 import { getMyBids } from "../../helpers/freelancer/api";
+import { Link } from "react-router";
 
 const { Title, Text } = Typography;
 
@@ -205,7 +206,10 @@ const FreelancerDashboard = () => {
 
     return (
         <div className="flex flex-col gap-6 w-[96%] max-w-[1440px] py-8 mx-auto">
-            <Title level={2}>Freelancer Dashboard</Title>
+            <div className="flex justify-between items-center mb-4">
+                <Title level={2}>Client Dashboard</Title>
+                <Link to="/projects" className="ant-btn ant-btn-primary">Go to projects</Link>
+            </div>
 
             <Row gutter={16}>
                 {stats.map((stat, index) => (

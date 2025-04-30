@@ -20,14 +20,18 @@ const Hero = () => {
                 <p className="text-2xl max-md:text-xl mt-4 text-gray-100">
                     Find the perfect freelancer for your project, or showcase your skills and get hired.
                 </p>
+                <br />
+                <span>
+                    Register as
+                </span>
 
                 <div className="flex mt-8 gap-4">
                     <NavLink to="/register?as=freelancer" className="bg-black hover:text-black text-white px-6 py-3 rounded-4xl hover:bg-white transition duration-300">
-                        Find Projects
+                        Freelancer
                     </NavLink>
 
                     <NavLink to="/register?as=client" className="ring hover:ring-0 px-6 py-3 rounded-4xl hover:bg-white hover:text-black text-white transition duration-300">
-                        Recruit Talent
+                        Client
                     </NavLink>
                 </div>
             </div>
