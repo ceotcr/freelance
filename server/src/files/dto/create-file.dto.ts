@@ -1,19 +1,20 @@
+import { Transform } from 'class-transformer';
 import { IsString, IsNotEmpty, IsInt, Min, IsOptional } from 'class-validator';
 
 export class CreateFileDto {
     @IsString()
-    @IsNotEmpty()
-    fileName: string;
+    @IsOptional()
+    fileName?: string;
 
     @IsString()
-    @IsNotEmpty()
-    fileUrl: string;
+    @IsOptional()
+    fileUrl?: string;
 
-    @IsInt()
     @IsNotEmpty()
+    @Transform(({ value }) => parseInt(value, 10))
     userId: number;
 
-    @IsInt()
     @IsNotEmpty()
+    @Transform(({ value }) => parseInt(value, 10))
     projectId: number;
 }

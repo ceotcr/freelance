@@ -20,7 +20,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User, Project, Bid, Milestone, Skill, Invoice, UploadedFile, Message, LogoutLog],
+    entities: [User, Project, Bid, Milestone, Skill, Invoice, UploadedFile, Message, UploadedFile, LogoutLog],
     synchronize: true,
   }), MulterModule.registerAsync({
     useClass: MulterConfig

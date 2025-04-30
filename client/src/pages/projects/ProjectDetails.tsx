@@ -7,6 +7,7 @@ import MilestoneList from "../../components/milestones/MileStoneList";
 import { useMilestones, useDeleteMilestone, useCompleteMilestone, useApproveMilestone } from "../../helpers/milestones/hooks";
 import { useBids, useAcceptBid, useDeleteBid } from "../../helpers/bids/hooks";
 import BidList from "../../components/bids/BidList";
+import FileManagement from "../../components/files/FileManagement";
 
 const { Title, Text } = Typography;
 
@@ -188,6 +189,10 @@ export default function ProjectDetailsPage() {
                     onDelete={handleBidsDelete}
                     loading={bidsLoading}
                 />
+
+                <Card title="Project Files Management">
+                    <FileManagement projectId={Number(id)} />
+                </Card>
             </Space>
         </div>
     );

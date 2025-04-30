@@ -70,6 +70,12 @@ export class BidsService {
   async update(id: number, updateBidDto: UpdateBidDto): Promise<Bid> {
     const bid = await this.findOne(id);
     const updated = this.bidRepository.merge(bid, updateBidDto);
+    if (updateBidDto.status == 'accepted') {
+      await this.projectRepository.update(
+        { id: bid.project.id },
+        { status: 'in_progress' },
+      );
+    }
     return await this.bidRepository.save(updated);
   }
 
