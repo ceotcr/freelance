@@ -12,6 +12,12 @@ export const ProjectSchema = z.object({
         firstName: z.string(),
         lastName: z.string(),
     }),
+    freelancer: z.object({
+        id: z.number(),
+        firstName: z.string(),
+        lastName: z.string(),
+        profilePicture: z.string().nullable(),
+    }).nullable(),
 });
 
 export const CreateProjectSchema = z.object({

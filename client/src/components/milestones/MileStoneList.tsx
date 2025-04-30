@@ -2,6 +2,7 @@ import { Card, List, Tag, Button, Space, Typography, Divider } from "antd";
 import { Milestone, MilestoneStatus } from "../../helpers/milestones/types";
 import { CheckOutlined, DollarOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useAuthStore } from "../../store/auth.store";
 
 interface MilestoneListProps {
     milestones: Milestone[];
@@ -12,6 +13,8 @@ interface MilestoneListProps {
     onApprove: (id: number) => void;
     isClient: boolean;
     loading?: boolean;
+    clientId: number;
+    fid?: number;
 }
 
 const statusColors: Record<MilestoneStatus, string> = {
@@ -29,7 +32,10 @@ export default function MilestoneList({
     onApprove,
     isClient,
     loading = false,
+    clientId,
+    fid
 }: MilestoneListProps) {
+    const { user } = useAuthStore()
     return (
         <Card title="Project Milestones" loading={loading}>
             <List
@@ -43,7 +49,7 @@ export default function MilestoneList({
                         actions={[
                             <Space key="actions" className="w-full justify-between"
                                 split={<Divider type="vertical" />}>
-                                {!isClient && milestone.status === MilestoneStatus.PENDING && (
+                                {!isClient && milestone.status === MilestoneStatus.PENDING && (user?.id == fid) && (
                                     <Button
                                         icon={<CheckOutlined />}
                                         onClick={() => onComplete(milestone.id)}
@@ -60,19 +66,26 @@ export default function MilestoneList({
                                         Approve
                                     </Button>
                                 )}
-                                <Button
-                                    icon={<EditOutlined />}
-                                    onClick={() => onEdit(milestone)}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    onClick={() => onDelete(milestone.id)}
-                                >
-                                    Delete
-                                </Button>
+                                {
+                                    user?.id == clientId && (
+                                        <>
+
+                                            <Button
+                                                icon={<EditOutlined />}
+                                                onClick={() => onEdit(milestone)}
+                                            >
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                danger
+                                                icon={<DeleteOutlined />}
+                                                onClick={() => onDelete(milestone.id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </>
+                                    )
+                                }
                             </Space>,
                         ]}
                     >

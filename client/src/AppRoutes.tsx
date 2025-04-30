@@ -13,6 +13,8 @@ import ProjectsPage from './pages/projects/Projects'
 import ClientAuthLayout from './layouts/ClientAuthLayout'
 import CreateMilestonePage from './pages/milestones/CreateMilestone'
 import EditMilestonePage from './pages/milestones/EditMilestone'
+import FLAuthLayout from './layouts/FLAuthLayout'
+import CreateBidPage from './pages/bids/CreateBids'
 
 const AppRoutes = () => {
     return (
@@ -28,6 +30,9 @@ const AppRoutes = () => {
                     <Route path="/projects/create" element={<CreateProjectPage />} />
                     <Route path="/projects/:id/milestones/create" element={<CreateMilestonePage />} />
                     <Route path="/milestones/:milestoneId/edit" element={<EditMilestonePage />} />
+                </Route>
+                <Route element={<FLAuthLayout />}>
+                    <Route path='projects/:projectId/bid' element={<CreateBidPage />} />
                 </Route>
                 <Route path='/profile' element={<CompleteProfile />} />
                 <Route path="/dashboard" element={<DashBoard />} />

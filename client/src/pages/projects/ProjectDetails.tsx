@@ -5,6 +5,8 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAuthStore } from "../../store/auth.store";
 import MilestoneList from "../../components/milestones/MileStoneList";
 import { useMilestones, useDeleteMilestone, useCompleteMilestone, useApproveMilestone } from "../../helpers/milestones/hooks";
+import { useBids, useAcceptBid, useDeleteBid } from "../../helpers/bids/hooks";
+import BidList from "../../components/bids/BidList";
 
 const { Title, Text } = Typography;
 
@@ -67,7 +69,41 @@ export default function ProjectDetailsPage() {
         completed: "success",
     } as const;
 
-    if (isLoading) {
+    const { data: bids, isLoading: bidsLoading } = useBids(Number(id));
+    const acceptBid = useAcceptBid();
+    const deleteBid = useDeleteBid();
+
+    const handleAccept = (bidId: number) => {
+        if (!id) return;
+        acceptBid.mutate(
+            { projectId: Number(id), bidId },
+            {
+                onSuccess: () => {
+                    message.success("Bid accepted successfully");
+                },
+                onError: () => {
+                    message.error("Failed to accept bid");
+                },
+            }
+        );
+    };
+
+    const handleReject = (bidId: number) => {
+        message.info("Reject functionality to be implemented");
+    };
+
+    const handleBidsDelete = (bidId: number) => {
+        deleteBid.mutate({ id: bidId, projectId: Number(id) }, {
+            onSuccess: () => {
+                message.success("Bid deleted successfully");
+            },
+            onError: () => {
+                message.error("Failed to delete bid");
+            },
+        });
+    };
+
+    if (isLoading || bidsLoading) {
         return (
             <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem" }}>
                 <Space direction="vertical" size="middle" style={{ width: "100%" }}>
@@ -138,8 +174,19 @@ export default function ProjectDetailsPage() {
                     onDelete={handleDeleteMileStone}
                     onComplete={handleComplete}
                     onApprove={handleApprove}
-                    isClient={true}
+                    isClient={user?.role == "client"}
                     loading={milestonesLoading}
+                    clientId={project.client.id}
+                    fid={project.freelancer?.id}
+                />
+                <BidList
+                    bids={bids || []}
+                    projectId={Number(id)}
+                    isClient={user?.role == "client"}
+                    onAccept={handleAccept}
+                    onReject={handleReject}
+                    onDelete={handleBidsDelete}
+                    loading={bidsLoading}
                 />
             </Space>
         </div>
