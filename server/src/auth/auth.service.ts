@@ -31,19 +31,11 @@ export class AuthService {
 
         res.cookie('access_token', access_token, { httpOnly: true, secure: false, sameSite: "strict", expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
         res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false, sameSite: "strict", expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
+        const { password: pswd, ...userWithoutPassword } = user;
         return res.status(200).json({
             access_token,
             refresh_token,
-            user: {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                bio: user.bio,
-                profilePicture: user.profilePicture
-            }
+            user: userWithoutPassword
         });
     }
 
@@ -110,20 +102,17 @@ export class AuthService {
             expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION),
         });
 
-
+        const { password, ...userWithoutPassword } = await this.usersService.findOne(user.id);
 
         return res.status(200).json({
             access_token: newAccessToken,
-            user: {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                bio: user.bio,
-                profilePicture: user.profilePicture,
-            },
+            user: userWithoutPassword
         });
+    }
+    async getMe(id: number) {
+        const user = await this.usersService.findOne(id)
+        if (!user) throw new UnauthorizedException()
+        const { password, ...userWithoutPassword } = user
+        return userWithoutPassword
     }
 }

@@ -3,28 +3,28 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginInput, LoginResponse } from '../schemas/login.schema';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { Form, Input, Button, Col, Row, message } from 'antd';
 import { useAuthStore } from '../store/auth.store';
 import { useNavigate } from 'react-router';
+import axiosInstance from '../helpers/axios.instance';
 
 const Login: React.FC = () => {
     const authStore = useAuthStore()
     const navigate = useNavigate()
     const mutation = useMutation({
         mutationFn: async (data: LoginInput) => {
-            const response = await axios.post<LoginResponse>('http://localhost:5000/auth/login', data, {
-                withCredentials: true
-            },
-            );
+            const response = await axiosInstance.post<LoginResponse>('/auth/login', data);
             return response.data;
         },
         onSuccess: (data: LoginResponse) => {
             authStore.setTokens(data.accessToken, data.refreshToken);
             authStore.setUser(data.user);
             message.success(`Welcome, ${data.user.firstName + ' ' + data.user.lastName}!`);
-            if (!data.user.bio || !data.user.profilePicture) {
+            if ((!data.user.bio || !data.user.profilePicture) && data.user.role === 'freelancer') {
                 navigate("/complete-profile")
+            }
+            else {
+                navigate('/dashboard')
             }
         },
         onError: () => {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, Like } from 'typeorm';
+import { Repository, FindOptionsWhere, Like, In } from 'typeorm';
 import { User, Skill } from 'src/exports/entities';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -48,10 +48,16 @@ export class UsersService {
     });
 
     if (existingUser) {
-      throw new ConflictException('Username or Email already exists');
+      if (existingUser.username === createUserDto.username) {
+        throw new ConflictException('Username already exists');
+      }
+      throw new ConflictException('Email already exists');
     }
 
-    const user = this.userRepository.create(createUserDto);
+    const skills = createUserDto.skills
+      ? await this.skillRepository.findBy({ id: In(JSON.parse(createUserDto.skills)) })
+      : [];
+    const user = this.userRepository.create({ ...createUserDto, skills });
     return this.userRepository.save(user);
   }
 
@@ -109,12 +115,17 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
-
-    Object.assign(user, updateUserDto);
-
-    return this.userRepository.save(user);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    let skills = [] as Skill[];
+    if (updateUserDto.skills) {
+      skills = await this.skillRepository.findBy({ id: In(JSON.parse(updateUserDto.skills)) })
+    }
+    const user = await this.userRepository.preload({ id, ...updateUserDto, skills });
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    const { password, ...woutPswd } = await this.userRepository.save(user)
+    return woutPswd
   }
 
   async remove(id: number): Promise<void> {

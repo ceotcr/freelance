@@ -1,8 +1,19 @@
-import { Outlet, useSearchParams, useLocation } from "react-router"
+import { Outlet, useSearchParams, useLocation, useNavigate } from "react-router"
 import ClientImage from "../assets/images/for-client.jpg"
 import TalentImage from "../assets/images/for-talent.jpg"
 import LoginImage from "../assets/images/login.jpg"
+import { useAuthStore } from "../store/auth.store"
 const AuthLayout = () => {
+    const { user } = useAuthStore()
+    const navigate = useNavigate()
+    if (user) {
+        if ((user.bio && user.profilePicture) || user.role === 'client' || user.role === 'admin') {
+            navigate('/dashboard')
+        }
+        else {
+            navigate('/profile')
+        }
+    }
     const [searchParams] = useSearchParams()
     const as = searchParams.get("as")
     const location = useLocation()

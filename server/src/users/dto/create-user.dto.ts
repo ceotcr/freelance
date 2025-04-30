@@ -1,5 +1,6 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, IsUrl, MinLength } from "class-validator";
+import { IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, MinLength } from "class-validator";
 import { UserRole } from "../entities/user.entity";
+import { Transform } from "class-transformer";
 export class CreateUserDto {
     @IsNotEmpty()
     @IsString()
@@ -33,4 +34,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     @IsIn(Object.values(UserRole))
     role: UserRole;
+
+    @IsOptional()
+    skills?: string;
 }

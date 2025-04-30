@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Ip, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Ip, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -39,4 +39,11 @@ export class AuthController {
     await this.authService.logout({ userAgent, ipAddress, req, res });
   }
 
+  @Get('me')
+  async me(@Req() req: Request) {
+    if (!req.user) {
+      throw new UnauthorizedException()
+    }
+    return this.authService.getMe(req.user.id)
+  }
 }

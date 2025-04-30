@@ -13,11 +13,12 @@ export type LoginResponse = {
     user: {
         id: string;
         username: string;
-        role: 'admin' | 'client' | 'user'; // Adjust roles as needed
+        role: 'admin' | 'client' | 'freelancer';
         email: string;
         firstName: string;
         lastName: string;
         bio?: string;
         profilePicture?: string;
+        skills: { id: number; name: string }[];
     };
 }

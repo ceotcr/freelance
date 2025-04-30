@@ -4,9 +4,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterInput } from '../schemas/register.schema';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { useSearchParams } from 'react-router';
-import { Form, Input, Select, Button, Row, Col } from 'antd';
+import { Form, Input, Select, Button, Row, Col, message } from 'antd';
+import axiosInstance from '../helpers/axios.instance';
 
 const { Option } = Select;
 
@@ -15,12 +15,12 @@ const RegisterForm: React.FC = () => {
 
     const mutation = useMutation({
         mutationFn: (data: RegisterInput) =>
-            axios.post('http://localhost:5000/auth/register', data),
+            axiosInstance.post('/auth/register', data),
         onSuccess: () => {
-            alert('Registration successful!');
+            message.success('Registration successful!');
         },
-        onError: () => {
-            alert('Registration failed.');
+        onError: (error) => {
+            message.error(error.message)
         },
     });
 

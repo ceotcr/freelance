@@ -1,16 +1,18 @@
 // src/stores/useAuthStore.ts
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface User {
     id: string;
     username: string;
-    role: 'admin' | 'client' | 'user';
+    role: 'admin' | 'client' | 'freelancer';
     email: string;
     firstName: string;
     lastName: string;
     profilePicture?: string;
     bio?: string;
+    skills: {
+        id: number; name: string;
+    }[];
 }
 
 interface AuthState {
@@ -24,21 +26,16 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-    persist(
-        (set) => ({
-            user: null,
-            accessToken: null,
-            refreshToken: null,
-            setUser: (user) => set({ user }),
-            setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-            updateProfile: (data) =>
-                set((state) => ({
-                    user: state.user ? { ...state.user, ...data } : null,
-                })),
-            logout: () => set({ user: null, accessToken: null, refreshToken: null }),
-        }),
-        {
-            name: 'auth-storage',
-        }
-    )
+    (set) => ({
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        setUser: (user) => set({ user }),
+        setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+        updateProfile: (data) =>
+            set((state) => ({
+                user: state.user ? { ...state.user, ...data } : null,
+            })),
+        logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+    })
 );
