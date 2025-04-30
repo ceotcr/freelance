@@ -28,11 +28,19 @@ export class AuthService {
         const access_token = this.jwtService.sign(payload, { expiresIn: '15m' });
         const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-        res.cookie('access_token', access_token, { httpOnly: true, secure: true, expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
-        res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: true, expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
+        res.cookie('access_token', access_token, { httpOnly: true, secure: false, sameSite: "none", expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
+        res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false, sameSite: "none", expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
         return res.status(200).json({
             access_token,
-            refresh_token
+            refresh_token,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+            }
         });
     }
 
