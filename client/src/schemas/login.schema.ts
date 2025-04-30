@@ -17,5 +17,7 @@ export type LoginResponse = {
         email: string;
         firstName: string;
         lastName: string;
+        bio?: string;
+        profilePicture?: string;
     };
 }

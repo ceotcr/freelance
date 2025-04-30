@@ -6,18 +6,26 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { Form, Input, Button, Col, Row, message } from 'antd';
 import { useAuthStore } from '../store/auth.store';
+import { useNavigate } from 'react-router';
 
 const Login: React.FC = () => {
     const authStore = useAuthStore()
+    const navigate = useNavigate()
     const mutation = useMutation({
         mutationFn: async (data: LoginInput) => {
-            const response = await axios.post<LoginResponse>('http://localhost:5000/auth/login', data);
+            const response = await axios.post<LoginResponse>('http://localhost:5000/auth/login', data, {
+                withCredentials: true
+            },
+            );
             return response.data;
         },
         onSuccess: (data: LoginResponse) => {
             authStore.setTokens(data.accessToken, data.refreshToken);
             authStore.setUser(data.user);
-            message.success(`Welcome back, ${data.user.firstName + ' ' + data.user.lastName}!`);
+            message.success(`Welcome, ${data.user.firstName + ' ' + data.user.lastName}!`);
+            if (!data.user.bio || !data.user.profilePicture) {
+                navigate("/complete-profile")
+            }
         },
         onError: () => {
             alert('Login failed.');

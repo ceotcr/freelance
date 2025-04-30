@@ -27,14 +27,14 @@ export class User {
     @Column({ unique: true })
     username: string;
 
-    @Column({ nullable: true, default: null })
-    profilePicture: string;
+    @Column({ type: "text", nullable: true, default: null })
+    profilePicture: string | null;
 
     @Column({ unique: true })
     email: string;
 
     @Column({ nullable: true, default: null, type: 'text' })
-    bio: string;
+    bio: string | null;
 
     @Column()
     password: string;

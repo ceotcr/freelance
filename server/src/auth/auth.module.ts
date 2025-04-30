@@ -7,6 +7,7 @@ import { LogoutLog, User } from 'src/exports/entities';
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_SECRET } from 'src/common/constants/jwt.constants';
 import { JwtStrategy } from './strategies/jwt-auth.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [UsersModule, TypeOrmModule.forFeature([User, LogoutLog]), JwtModule.register({
@@ -15,6 +16,6 @@ import { JwtStrategy } from './strategies/jwt-auth.strategy';
     signOptions: { expiresIn: '15m' },
   })],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
 })
 export class AuthModule { }

@@ -9,6 +9,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
 import { ACCESS_TOKEN_COOKIE_EXPIRATION, JWT_SECRET, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
+import { profile } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -28,8 +29,8 @@ export class AuthService {
         const access_token = this.jwtService.sign(payload, { expiresIn: '15m' });
         const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-        res.cookie('access_token', access_token, { httpOnly: true, secure: false, sameSite: "none", expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
-        res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false, sameSite: "none", expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
+        res.cookie('access_token', access_token, { httpOnly: true, secure: false, sameSite: "strict", expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION) });
+        res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false, sameSite: "strict", expires: new Date(Date.now() + REFRESH_TOKEN_COOKIE_EXPIRATION) });
         return res.status(200).json({
             access_token,
             refresh_token,
@@ -40,6 +41,8 @@ export class AuthService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
+                bio: user.bio,
+                profilePicture: user.profilePicture
             }
         });
     }
@@ -92,5 +95,35 @@ export class AuthService {
         if (latestLogout && latestLogout.logoutTime.getTime() / 1000 > tokenIat) {
             throw new UnauthorizedException('Token invalid due to logout.');
         }
+    }
+
+    async refresh(req: Request, res: Response) {
+        if (!req.user) throw new UnauthorizedException();
+
+        const user = req.user;
+        const payload = { username: user.username, role: user.role, sub: user.id };
+        const newAccessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+
+        res.cookie('access_token', newAccessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            expires: new Date(Date.now() + ACCESS_TOKEN_COOKIE_EXPIRATION),
+        });
+
+
+
+        return res.status(200).json({
+            access_token: newAccessToken,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                bio: user.bio,
+                profilePicture: user.profilePicture,
+            },
+        });
     }
 }

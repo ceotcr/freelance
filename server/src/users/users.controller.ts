@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddSkillToUserDto } from './dto/add-skill.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SERVER_URL } from 'src/common/constants/urls.constants';
+import { diskStorage } from 'multer';
 
 @Controller('users')
 export class UsersController {
@@ -45,5 +48,23 @@ export class UsersController {
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
+  }
+
+  @Post(':id/complete-profile')
+  @UseInterceptors(FileInterceptor('profilePicture', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+      },
+    }),
+  }))
+  async completeProfile(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @UploadedFile() file: Express.Multer.File) {
+    const newDto = {
+      ...updateUserDto,
+      profilePicture: `/uploads/${file.filename}`,
+    }
+    return this.usersService.update(id, newDto);
   }
 }

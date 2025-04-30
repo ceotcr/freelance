@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { ACCESS_TOKEN_COOKIE_EXPIRATION, REFRESH_TOKEN_COOKIE_EXPIRATION } from 'src/common/constants/jwt.constants';
 import { Public } from 'src/common/decorators/public.decorator';
+import { JwtRefreshGuard } from 'src/common/guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +20,13 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Public()
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    await this.authService.refresh(req, res)
   }
 
   @Post('logout')

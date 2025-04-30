@@ -4,6 +4,7 @@ import { diskStorage } from 'multer';
 import { CreateFileDto } from './dto/create-file.dto';
 import { extname } from 'path';
 import { FilesService } from './files.service';
+import { SERVER_URL } from 'src/common/constants/urls.constants';
 
 @Controller('uploaded-files')
 export class FilesController {

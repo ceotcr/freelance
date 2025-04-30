@@ -5,10 +5,12 @@ import { persist } from 'zustand/middleware';
 interface User {
     id: string;
     username: string;
-    role: 'admin' | 'client' | 'user'; // Adjust roles as needed
+    role: 'admin' | 'client' | 'user';
     email: string;
     firstName: string;
     lastName: string;
+    profilePicture?: string;
+    bio?: string;
 }
 
 interface AuthState {
@@ -17,6 +19,7 @@ interface AuthState {
     refreshToken: string | null;
     setUser: (user: User) => void;
     setTokens: (accessToken: string, refreshToken: string) => void;
+    updateProfile: (data: Partial<User>) => void;
     logout: () => void;
 }
 
@@ -28,10 +31,14 @@ export const useAuthStore = create<AuthState>()(
             refreshToken: null,
             setUser: (user) => set({ user }),
             setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+            updateProfile: (data) =>
+                set((state) => ({
+                    user: state.user ? { ...state.user, ...data } : null,
+                })),
             logout: () => set({ user: null, accessToken: null, refreshToken: null }),
         }),
         {
-            name: 'auth-storage', // Key for localStorage
+            name: 'auth-storage',
         }
     )
 );
