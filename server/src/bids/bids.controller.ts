@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { User } from 'src/exports/entities';
 
 @Controller('bids')
 export class BidsController {
@@ -15,6 +17,11 @@ export class BidsController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bidsService.findOne(id);
+  }
+
+  @Post('my-bids')
+  async findByFreelancer(@Body('id', ParseIntPipe) id: number) {
+    return this.bidsService.findByFreelancer(id);
   }
 
   @Patch(':id')

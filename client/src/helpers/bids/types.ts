@@ -19,6 +19,17 @@ export const BidSchema = z.object({
         profilePicture: z.string().nullable(),
         rating: z.number().optional(),
     }),
+    project: z.object({
+        id: z.number(),
+        title: z.string(),
+        description: z.string(),
+        budget: z.number(),
+        status: z.string(),
+        clientId: z.number(),
+        createdAt: z.string().datetime(),
+        updatedAt: z.string().datetime(),
+    }),
+
     projectId: z.number(),
 });
 

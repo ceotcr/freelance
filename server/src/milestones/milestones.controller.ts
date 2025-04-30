@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe 
 import { MilestonesService } from './milestones.service';
 import { CreateMilestoneDto } from './dto/create-milestone.dto';
 import { UpdateMilestoneDto } from './dto/update-milestone.dto';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { User } from 'src/exports/entities';
 
 @Controller('milestones')
 export class MilestonesController {

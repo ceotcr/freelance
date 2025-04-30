@@ -48,9 +48,9 @@ export class BidsService {
     });
   }
 
-  async findByFreelancer(freelancerId: number): Promise<Bid[]> {
+  async findByFreelancer(id: number): Promise<Bid[]> {
     return this.bidRepository.find({
-      where: { freelancer: { id: freelancerId } },
+      where: { freelancer: { id } },
       relations: ['freelancer', 'project'],
       order: { createdAt: 'DESC' },
     });
@@ -77,7 +77,15 @@ export class BidsService {
       );
       await this.rejectOtherBids(bid.project.id, bid.id);
     }
-    return await this.bidRepository.save(updated);
+    await this.bidRepository.save(updated);
+    const newBid = await this.bidRepository.findOne({
+      where: { id },
+      relations: ['freelancer', 'project'],
+    });
+    if (!newBid) {
+      throw new NotFoundException('Bid not found');
+    }
+    return newBid;
   }
 
   async rejectOtherBids(projectId: number, acceptedBidId: number): Promise<void> {

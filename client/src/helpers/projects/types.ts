@@ -18,6 +18,19 @@ export const ProjectSchema = z.object({
         lastName: z.string(),
         profilePicture: z.string().nullable(),
     }).nullable(),
+    bids: z.array(
+        z.object({
+            id: z.number(),
+            amount: z.number(),
+            status: z.enum(["pending", "accepted", "rejected"]),
+            freelancer: z.object({
+                id: z.number(),
+                firstName: z.string(),
+                lastName: z.string(),
+            }),
+            projectId: z.number(),
+        })
+    ).optional(),
 });
 
 export const CreateProjectSchema = z.object({
