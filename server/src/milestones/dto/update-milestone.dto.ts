@@ -14,4 +14,12 @@ export class UpdateMilestoneDto {
     @IsOptional()
     @IsIn(Object.values(MilestoneStatus))
     status?: MilestoneStatus;
+
+    @IsString()
+    @IsOptional()
+    description?: string;
+
+    @IsString()
+    @IsOptional()
+    dueDate?: string;
 }

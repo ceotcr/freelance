@@ -17,7 +17,7 @@ export class AuthService {
     ) { }
 
     async login({ username, password }: LoginDto, res: Response) {
-        const user = await this.usersService.getUserByUserName(username);
+        const user = await this.usersService.getUserByUserName(username, true);
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid password');

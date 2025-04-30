@@ -6,6 +6,7 @@ import { Project } from 'src/projects/entities/project.entity';
 import { Skill } from 'src/skills/entities/skill.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { UploadedFile } from 'src/files/entities/file.entity';
+import { Exclude } from 'class-transformer';
 
 export enum UserRole {
     CLIENT = 'client',
@@ -36,7 +37,8 @@ export class User {
     @Column({ nullable: true, default: null, type: 'text' })
     bio: string | null;
 
-    @Column()
+    @Column({ select: false })
+    @Exclude()
     password: string;
 
     @Column({

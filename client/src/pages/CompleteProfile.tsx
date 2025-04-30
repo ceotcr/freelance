@@ -14,7 +14,7 @@ import ProfieImage from '../assets/images/profile.jpg'
 const CompleteProfile: React.FC = () => {
     const { user, setUser } = useAuthStore();
     const [previewImage, setPreviewImage] = useState<string | undefined>(SERVER_URL + user?.profilePicture);
-    const [selectedSkills, setSelectedSkills] = useState<number[]>(user?.skills.map(skill => skill.id) || []);
+    const [selectedSkills, setSelectedSkills] = useState<number[]>(user?.skills?.map(skill => skill.id) || []);
     const {
         register,
         handleSubmit,
@@ -151,7 +151,11 @@ const CompleteProfile: React.FC = () => {
                             />
                             {errors.bio && <p style={{ color: 'red', marginTop: 4 }}>{errors.bio.message}</p>}
                         </div>
-                        <SkillSelector selectedSkills={selectedSkills} setSelectedSkills={setSelectedSkills} />
+                        {
+                            user?.role === 'freelancer' && (
+                                <SkillSelector selectedSkills={selectedSkills} setSelectedSkills={setSelectedSkills} />
+                            )
+                        }
                         <button
                             type="submit"
                             disabled={mutation.isPending}

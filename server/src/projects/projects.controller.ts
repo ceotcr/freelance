@@ -47,6 +47,15 @@ export class ProjectsController {
     return this.projectsService.findAll(paginationDto, filterDto);
   }
 
+  @Get('my-projects')
+  @Roles(UserRole.CLIENT)
+  findMyProjects(
+    @Query() paginationDto: PaginationDto,
+    @GetUser() user: User,
+  ) {
+    return this.projectsService.findMyProjects(paginationDto, user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.projectsService.findOne(+id);

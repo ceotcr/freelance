@@ -12,4 +12,12 @@ export class CreateMilestoneDto {
     @IsInt()
     @Min(1)
     projectId: number;
+
+    @IsString()
+    @IsNotEmpty()
+    description: string;
+
+    @IsString()
+    @IsNotEmpty()
+    dueDate: string; // ISO 8601 date string
 }

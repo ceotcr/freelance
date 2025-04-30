@@ -14,6 +14,12 @@ export class Milestone {
     @Column()
     title: string;
 
+    @Column()
+    description: string;
+
+    @Column()
+    dueDate: Date;
+
     @Column('decimal')
     amount: number;
 
@@ -24,6 +30,13 @@ export class Milestone {
     })
     status: MilestoneStatus;
 
+
     @ManyToOne(() => Project, project => project.milestones)
     project: Project;
+
+    @Column({ default: () => "CURRENT_TIMESTAMP" })
+    createdAt: Date;
+
+    @Column({ default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
+    updatedAt: Date;
 }

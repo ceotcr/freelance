@@ -49,7 +49,8 @@ export class MilestonesService {
   async update(id: number, updateMilestoneDto: UpdateMilestoneDto): Promise<Milestone> {
     const milestone = await this.findOne(id);
     const updated = this.milestoneRepository.merge(milestone, updateMilestoneDto);
-    return await this.milestoneRepository.save(updated);
+    await this.milestoneRepository.save(updated);
+    return updated;
   }
 
   async remove(id: number): Promise<void> {

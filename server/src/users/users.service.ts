@@ -76,9 +76,10 @@ export class UsersService {
     return user;
   }
 
-  async getUserByUserName(username: string): Promise<User> {
+  async getUserByUserName(username: string, getPswd = false): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { username },
+      select: getPswd ? ['id', 'username', 'role', 'password', 'firstName', 'lastName', 'email', 'profilePicture', 'bio'] : ['id', 'username', 'role', 'firstName', 'lastName', 'email', 'profilePicture', 'bio'],
     });
 
     if (!user) {

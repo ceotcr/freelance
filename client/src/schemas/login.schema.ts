@@ -11,7 +11,7 @@ export type LoginResponse = {
     accessToken: string;
     refreshToken: string;
     user: {
-        id: string;
+        id: number;
         username: string;
         role: 'admin' | 'client' | 'freelancer';
         email: string;

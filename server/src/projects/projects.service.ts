@@ -68,6 +68,20 @@ export class ProjectsService {
     return { data, count };
   }
 
+  async findMyProjects(paginationDto: PaginationDto, client: User): Promise<{ data: Project[]; count: number }> {
+    const { page = 1, limit = 10, sortBy = 'postedAt', sortOrder = 'DESC' } = paginationDto || {};
+
+    const query = this.projectRepository.createQueryBuilder('project')
+      .leftJoinAndSelect('project.client', 'client')
+      .where('project.clientId = :clientId', { clientId: client.id })
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy(`project.${sortBy}`, sortOrder as 'ASC' | 'DESC');
+
+    const [data, count] = await query.getManyAndCount();
+    return { data, count };
+  }
+
   async findOne(id: number): Promise<Project> {
     const project = await this.projectRepository.findOne({
       where: { id },

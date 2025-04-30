@@ -1,6 +1,20 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateProjectDto } from './create-project.dto';
+import { IsString, IsNumber, IsOptional, Min, IsIn, IsPositive } from 'class-validator';
 
-export class UpdateProjectDto extends PartialType(CreateProjectDto) {
+export class UpdateProjectDto {
+    @IsString()
+    @IsOptional()
+    title?: string;
 
+    @IsString()
+    @IsOptional()
+    description?: string;
+
+    @IsOptional()
+    @IsIn(["in_progress", "completed", "open", "cancelled"])
+    status?: "in_progress" | "completed" | "open" | "cancelled";
+
+    @IsNumber()
+    @IsPositive()
+    @IsOptional()
+    budget?: number;
 }

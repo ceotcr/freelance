@@ -6,6 +6,13 @@ import Register from './pages/Register'
 import CompleteProfile from './pages/CompleteProfile'
 import DashBoard from './pages/DashBoard'
 import MainLayout from './layouts/MainLayout'
+import CreateProjectPage from './pages/projects/CreateProject'
+import EditProjectPage from './pages/projects/EditProject'
+import ProjectDetailsPage from './pages/projects/ProjectDetails'
+import ProjectsPage from './pages/projects/Projects'
+import ClientAuthLayout from './layouts/ClientAuthLayout'
+import CreateMilestonePage from './pages/milestones/CreateMilestone'
+import EditMilestonePage from './pages/milestones/EditMilestone'
 
 const AppRoutes = () => {
     return (
@@ -16,9 +23,18 @@ const AppRoutes = () => {
                 <Route path='/register' element={<Register />} />
             </Route>
             <Route element={<MainLayout />}>
+                <Route element={<ClientAuthLayout />}>
+                    <Route path="/projects/:id/edit" element={<EditProjectPage />} />
+                    <Route path="/projects/create" element={<CreateProjectPage />} />
+                    <Route path="/projects/:id/milestones/create" element={<CreateMilestonePage />} />
+                    <Route path="/milestones/:milestoneId/edit" element={<EditMilestonePage />} />
+                </Route>
                 <Route path='/profile' element={<CompleteProfile />} />
                 <Route path="/dashboard" element={<DashBoard />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/projects/:id" element={<ProjectDetailsPage />} />
             </Route>
+
         </Routes>
     )
 }
