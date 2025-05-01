@@ -7,9 +7,5 @@ export class CreateMessageDto {
 
     @IsNotEmpty()
     @IsInt()
-    senderId: number;
-
-    @IsNotEmpty()
-    @IsInt()
     projectId: number;
 }

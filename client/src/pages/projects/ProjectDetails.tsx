@@ -8,10 +8,14 @@ import { useMilestones, useDeleteMilestone, useCompleteMilestone, useApproveMile
 import { useBids, useAcceptBid, useDeleteBid } from "../../helpers/bids/hooks";
 import BidList from "../../components/bids/BidList";
 import FileManagement from "../../components/files/FileManagement";
+import { useState } from "react";
+import MessageModal from "../../components/messages/MessageModal";
+import { MdMessage } from "react-icons/md";
 
 const { Title, Text } = Typography;
 
 export default function ProjectDetailsPage() {
+    const [messageModalOpen, setMessageModalOpen] = useState(false);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { data: project, isLoading } = useProject(Number(id));
@@ -124,18 +128,27 @@ export default function ProjectDetailsPage() {
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                 <Title level={2} style={{ margin: 0 }}>{project.title}</Title>
-                {
-                    project.client.id === user?.id && (
-                        <Space>
-                            <Button icon={<EditOutlined />} onClick={() => navigate(`/projects/${id}/edit`)}>
-                                Edit
+                <Space>
+                    {
+                        project.client.id === user?.id && (
+                            <>
+                                <Button icon={<EditOutlined />} onClick={() => navigate(`/projects/${id}/edit`)}>
+                                    Edit
+                                </Button>
+                                <Button icon={<DeleteOutlined />} danger onClick={handleDelete}>
+                                    Delete
+                                </Button></>
+                        )
+                    }
+                    {
+                        (project.client.id === user?.id || project.assignedTo?.id === user?.id) && (
+                            <Button type="primary" onClick={() => setMessageModalOpen(true)}>
+                                <MdMessage size={20} />
                             </Button>
-                            <Button icon={<DeleteOutlined />} danger onClick={handleDelete}>
-                                Delete
-                            </Button>
-                        </Space>
-                    )
-                }
+                        )
+                    }
+                </Space>
+
             </div>
 
             <Card>
@@ -190,13 +203,20 @@ export default function ProjectDetailsPage() {
                     loading={bidsLoading}
                 />
                 {
-                    project.assignedTo?.id === user?.id || project.client.id === user?.id && (
+                    (project.assignedTo?.id === user?.id || project.client.id === user?.id) && (
                         <Card title="Project Files Management">
                             <FileManagement projectId={Number(id)} clientId={project.client.id} fid={project.assignedTo?.id} />
                         </Card>
                     )
                 }
             </Space>
+            <MessageModal
+                projectId={Number(id)}
+                clientId={project.client.id}
+                freelancerId={project.assignedTo?.id}
+                open={messageModalOpen}
+                onCancel={() => setMessageModalOpen(false)}
+            />
         </div>
     );
 }

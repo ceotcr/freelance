@@ -1,4 +1,4 @@
-import { Card, Avatar, Tag, Button, Typography, Divider, Rate } from "antd";
+import { Card, Avatar, Tag, Button, Typography, Divider } from "antd";
 import { Bid, BidStatus } from "../../helpers/bids/types";
 import { UserOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";

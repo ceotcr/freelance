@@ -1,51 +1,60 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
-import { User } from 'src/users/entities/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class MessagesService {
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
   ) { }
 
-  async create(createMessageDto: CreateMessageDto): Promise<Message> {
-    const message = new Message();
-    message.content = createMessageDto.content;
-    message.sender = { id: createMessageDto.senderId } as User;
-    message.project = { id: createMessageDto.projectId } as Project;
+  async create(createMessageDto: CreateMessageDto, senderId: number): Promise<Message> {
+    const { content, projectId } = createMessageDto;
+
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['client', 'assignedTo'],
+    });
+
+    if (!project) {
+      throw new Error('Project not found');
+    }
+
+    const message = this.messageRepository.create({
+      content,
+      sender: { id: senderId },
+      project: { id: projectId },
+    });
 
     return this.messageRepository.save(message);
   }
 
-  findAll(): Promise<Message[]> {
-    return this.messageRepository.find({ relations: ['sender', 'project'] });
-  }
-
-  async findOne(id: number): Promise<Message> {
-    const message = await this.messageRepository.findOne({
-      where: { id },
-      relations: ['sender', 'project'],
+  async findAllByProject(projectId: number, userId: number): Promise<Message[]> {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['client', 'assignedTo'],
     });
-    if (!message) {
-      throw new NotFoundException(`Message with ID ${id} not found`);
+
+    if (!project) {
+      throw new Error('Project not found');
     }
-    return message;
-  }
 
-  async update(id: number, updateMessageDto: UpdateMessageDto): Promise<Message> {
-    await this.messageRepository.update(id, {
-      ...updateMessageDto,
+    // Check if user is either client or assigned freelancer
+    if (project.client.id !== userId && project.assignedTo?.id !== userId) {
+      throw new Error('Unauthorized access to messages');
+    }
+
+    return this.messageRepository.find({
+      where: { project: { id: projectId } },
+      relations: ['sender', 'project'],
+      order: { sentAt: 'ASC' },
     });
-    return this.findOne(id);
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.messageRepository.delete(id);
   }
 }

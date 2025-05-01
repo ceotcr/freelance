@@ -41,6 +41,7 @@ export class ProjectsService {
 
     const query = this.projectRepository.createQueryBuilder('project')
       .leftJoinAndSelect('project.client', 'client')
+      .leftJoinAndSelect('project.assignedTo', 'user')
       .skip((page - 1) * limit)
       .take(limit)
       .orderBy(`project.${sortBy}`, sortOrder as 'ASC' | 'DESC');
@@ -85,7 +86,7 @@ export class ProjectsService {
   async findOne(id: number): Promise<Project> {
     const project = await this.projectRepository.findOne({
       where: { id },
-      relations: ['client', 'bids', 'milestones', 'files', 'invoices', 'messages'],
+      relations: ['client', 'bids', 'milestones', 'files', 'invoices', 'messages', 'assignedTo'],
     });
 
     if (!project) {
@@ -141,27 +142,32 @@ export class ProjectsService {
       throw new NotFoundException('Bid does not belong to this project');
     }
 
-    // Accept the bid
+
     await this.bidsService.update(bidId, { status: 'accepted' });
 
-    // Reject other bids
+
     await this.bidsService.rejectOtherBids(projectId, bidId);
 
-    // Update project status
-    return this.update(projectId, {
+    await this.projectRepository.update(projectId, {
+      assignedTo: bid.freelancer,
       status: 'in_progress',
+    });
+
+    return this.projectRepository.findOneOrFail({
+      where: { id: projectId },
+      relations: ['client', 'assignedTo'],
     });
   }
 
   async completeMilestone(projectId: number, milestoneId: number): Promise<Milestone> {
-    await this.findOne(projectId); // Verify project exists
+    await this.findOne(projectId);
     return this.milestonesService.update(milestoneId, {
       status: MilestoneStatus.COMPLETED,
     });
   }
 
   async approveMilestone(projectId: number, milestoneId: number): Promise<Milestone> {
-    await this.findOne(projectId); // Verify project exists
+    await this.findOne(projectId);
     return this.milestonesService.update(milestoneId, {
       status: MilestoneStatus.APPROVED,
     });
@@ -173,23 +179,23 @@ export class ProjectsService {
   }
 
   async getProjectMilestones(projectId: number): Promise<Milestone[]> {
-    await this.findOne(projectId); // Verify project exists
+    await this.findOne(projectId);
     return this.milestonesService.findByProject(projectId);
   }
 
   async getProjectInvoices(projectId: number): Promise<Invoice[]> {
-    await this.findOne(projectId); // Verify project exists
+    await this.findOne(projectId);
     return this.invoicesService.findByProject(projectId);
   }
 
   async getProjectBids(projectId: number): Promise<Bid[]> {
-    await this.findOne(projectId); // Verify project exists
+    await this.findOne(projectId);
     return this.bidsService.findByProject(projectId);
   }
   async findFreelancerProjects(id: number) {
     const projects = await this.projectRepository.find({
       where: { assignedTo: { id } },
-      relations: ['client', 'bids', 'milestones', 'files', 'invoices', 'messages'],
+      relations: ['client', 'bids', 'milestones', 'files', 'invoices', 'messages', 'assignedTo'],
     });
 
     if (!projects || projects.length === 0) {

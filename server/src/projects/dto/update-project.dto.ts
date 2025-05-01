@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, Min, IsIn, IsPositive } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min, IsIn, IsPositive, IsInt } from 'class-validator';
 
 export class UpdateProjectDto {
     @IsString()
