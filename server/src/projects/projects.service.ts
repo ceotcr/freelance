@@ -48,11 +48,9 @@ export class ProjectsService {
       .skip((page - 1) * limit)
       .take(limit);
 
-    // Apply sorting
     if (['title', 'budget', 'postedAt', 'status'].includes(sortBy)) {
       query.orderBy(`project.${sortBy}`, sortOrder as 'ASC' | 'DESC');
     } else {
-      // Default sorting if invalid sortBy provided
       query.orderBy('project.postedAt', 'DESC');
     }
 

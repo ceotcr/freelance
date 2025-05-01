@@ -32,7 +32,6 @@ type ProjectsAction =
     | { type: 'SET_BUDGET_RANGE'; payload: { min?: number; max?: number } }
     | { type: 'RESET_FILTERS' };
 
-// Reducer function
 function projectsReducer(state: ProjectsState, action: ProjectsAction): ProjectsState {
     switch (action.type) {
         case 'SET_PAGE':
@@ -73,7 +72,6 @@ function projectsReducer(state: ProjectsState, action: ProjectsAction): Projects
     }
 }
 
-// Initial state
 const initialState: ProjectsState = {
     pagination: {
         page: 1,

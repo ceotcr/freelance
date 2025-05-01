@@ -25,7 +25,6 @@ const statusColors: Record<MilestoneStatus, string> = {
     [MilestoneStatus.PAID]: "purple",
 };
 
-// Mock invoice data - replace with your actual invoice interface
 interface Invoice {
     id: number;
     amount: number;
@@ -50,9 +49,7 @@ export default function MilestoneList({
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null);
 
-    // Mock function to fetch invoice data - replace with your actual API call
     const fetchInvoiceData = (milestoneId: number): Invoice => {
-        // In a real app, you would make an API call here
         return {
             id: 1,
             amount: milestones.find(m => m.id === milestoneId)?.amount || 0,

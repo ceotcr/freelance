@@ -46,7 +46,6 @@ export class MessagesService {
       throw new Error('Project not found');
     }
 
-    // Check if user is either client or assigned freelancer
     if (project.client.id !== userId && project.assignedTo?.id !== userId) {
       throw new Error('Unauthorized access to messages');
     }

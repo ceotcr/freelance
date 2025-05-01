@@ -11,7 +11,7 @@ export class Invoice {
     amount: number;
 
     @Column()
-    status: string; // unpaid, paid, overdue
+    status: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     issuedAt: Date;

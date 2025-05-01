@@ -1,4 +1,3 @@
-// src/schemas/completeProfile.schema.ts
 import { z } from 'zod';
 
 export const completeProfileSchema = z.object({

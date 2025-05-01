@@ -60,7 +60,6 @@ export class AuthService {
         }
     }
     async logout({ userAgent, ipAddress, res, req }: { userAgent: string; ipAddress: string; res: Response; req: Request }) {
-        console.log(req.user)
         if (!req.user) {
             throw new UnauthorizedException('User not found');
         }
