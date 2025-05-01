@@ -4,14 +4,27 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterInput } from '../schemas/register.schema';
 import { useMutation } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { Form, Input, Select, Button, Row, Col, message } from 'antd';
 import axiosInstance from '../helpers/axios.instance';
+import { useAuthStore } from '../store/auth.store';
 
 const { Option } = Select;
 
 const RegisterForm: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const authStore = useAuthStore()
+    const navigate = useNavigate()
+    useEffect(() => {
+        if (authStore.user) {
+            if ((authStore.user.bio && authStore.user.profilePicture) || authStore.user.role !== "freelancer") {
+                navigate('/dashboard')
+            }
+            else {
+                navigate('/profile')
+            }
+        }
+    }, [authStore.user])
 
     const mutation = useMutation({
         mutationFn: (data: RegisterInput) =>

@@ -6,9 +6,11 @@ import { useAuthStore } from "../../store/auth.store";
 
 interface FileManagementProps {
     projectId: number;
+    clientId: number;
+    fid?: number;
 }
 
-export default function FileManagement({ projectId }: FileManagementProps) {
+export default function FileManagement({ projectId, clientId, fid }: FileManagementProps) {
     const { user } = useAuthStore();
     const { data: files = [], isLoading, refetch } = useProjectFiles(projectId);
 
@@ -23,14 +25,18 @@ export default function FileManagement({ projectId }: FileManagementProps) {
                     label: "Project Files",
                     children: (
                         <>
-                            {user?.role === "client" && (
+                            {(user?.role === "client" && user.id == clientId) && (
                                 <FileUpload projectId={projectId} onSuccess={refetch} />
                             )}
-                            <FileList
-                                files={clientFiles}
-                                title="Project Documents"
-                                onRefresh={refetch}
-                            />
+                            {
+                                (user?.id == clientId || user?.id == fid) && (
+                                    <FileList
+                                        files={clientFiles}
+                                        title="Project Documents"
+                                        onRefresh={refetch}
+                                    />
+                                )
+                            }
                         </>
                     ),
                 },
@@ -39,14 +45,17 @@ export default function FileManagement({ projectId }: FileManagementProps) {
                     label: "Submissions",
                     children: (
                         <>
-                            {user?.role === "freelancer" && (
+                            {(user?.role === "freelancer" && user.id == fid) && (
                                 <FileUpload projectId={projectId} onSuccess={refetch} />
-                            )}
-                            <FileList
-                                files={freelancerFiles}
-                                title="Freelancer Submissions"
-                                onRefresh={refetch}
-                            />
+                            )}{
+                                (user?.id == clientId || user?.id == fid) && (
+                                    <FileList
+                                        files={freelancerFiles}
+                                        title="Submissions"
+                                        onRefresh={refetch}
+                                    />
+                                )
+                            }
                         </>
                     ),
                 },

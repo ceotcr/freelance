@@ -1,7 +1,15 @@
 import axiosInstance from "../axios.instance";
 import { Project, CreateProjectInput, UpdateProjectInput } from "./types";
 
-export const getMyProjects = async (params?: any): Promise<{ data: Project[]; count: number }> => {
+export const getMyProjects = async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    orderBy?: "asc" | "desc";
+    freelancerId?: number;
+}): Promise<{ data: Project[]; count: number }> => {
     const response = await axiosInstance.get("/projects/my-projects", { params });
     return response.data;
 };
@@ -24,3 +32,15 @@ export const updateProject = async (id: number, data: UpdateProjectInput): Promi
 export const deleteProject = async (id: number): Promise<void> => {
     await axiosInstance.delete(`/projects/${id}`);
 };
+
+export const getProjects = async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    orderBy?: "asc" | "desc";
+}): Promise<{ data: Project[]; count: number }> => {
+    const response = await axiosInstance.get("/projects", { params });
+    return response.data;
+}

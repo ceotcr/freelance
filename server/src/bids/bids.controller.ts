@@ -14,6 +14,12 @@ export class BidsController {
     return this.bidsService.create(createBidDto);
   }
 
+  @Get('my-bids')
+  async findMyBids(@GetUser() user: User) {
+    if (!user) throw new UnauthorizedException('User not found');
+    return this.bidsService.findByFreelancer(user.id);
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bidsService.findOne(id);

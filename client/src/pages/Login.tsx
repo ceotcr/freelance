@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginInput, LoginResponse } from '../schemas/login.schema';
@@ -11,6 +11,16 @@ import axiosInstance from '../helpers/axios.instance';
 const Login: React.FC = () => {
     const authStore = useAuthStore()
     const navigate = useNavigate()
+    useEffect(() => {
+        if (authStore.user) {
+            if ((authStore.user.bio && authStore.user.profilePicture) || authStore.user.role !== "freelancer") {
+                navigate('/dashboard')
+            }
+            else {
+                navigate('/profile')
+            }
+        }
+    }, [authStore.user])
     const mutation = useMutation({
         mutationFn: async (data: LoginInput) => {
             const response = await axiosInstance.post<LoginResponse>('/auth/login', data);

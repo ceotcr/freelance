@@ -7,7 +7,6 @@ import type { Milestone } from "../../helpers/milestones/types";
 import type { File } from "../../helpers/files/types";
 import type { Bid } from "../../helpers/bids/types";
 import type { Project } from "../../helpers/projects/types";
-import { getBids } from "../../helpers/bids/api";
 import { getProjectFiles } from "../../helpers/files/api";
 import { getMilestones } from "../../helpers/milestones/apis";
 import { getMyProjects } from "../../helpers/projects/apis";
@@ -22,13 +21,13 @@ const FreelancerDashboard = () => {
     const { data: activeProjects } = useQuery({
         queryKey: ["freelancer-projects", user?.id],
         queryFn: async () => {
-            const projects = (await getMyBids(user?.id as number)).map((bid: Bid) => bid.status === 'accepted' ? bid.project : null);
+            const projects = (await getMyBids()).map((bid: Bid) => bid.status === 'accepted' ? bid.project : null);
             return projects
                 .filter((project): project is NonNullable<typeof project> => project !== null)
                 .map((project) => ({
                     ...project,
                     client: { id: project.clientId, firstName: '', lastName: '' },
-                    freelancer: null,
+                    assignedTo: null,
                     postedAt: project.createdAt,
                     bids: [],
                 })) as Project[];
@@ -40,11 +39,8 @@ const FreelancerDashboard = () => {
         queryKey: ["freelancer-bids", user?.id],
         queryFn: async () => {
             if (!user?.id) return [];
-            const projects = await getMyProjects();
-            const allBids = await Promise.all(
-                projects.data?.map((project: Project) => getBids(project.id)) || []
-            );
-            return allBids.flat().filter((bid: Bid) => bid.freelancer.id === user.id);
+            const bids = await getMyBids();
+            return bids
         },
         enabled: !!user?.id,
     });
@@ -138,7 +134,7 @@ const FreelancerDashboard = () => {
                                             Budget: ${project.budget.toLocaleString()}
                                         </Text>
                                     </div>
-                                    <Tag color="blue">In Progress</Tag>
+                                    <Tag color="blue" className="h-fit ml-2">In Progress</Tag>
                                 </div>
                             </Card>
                         </List.Item>

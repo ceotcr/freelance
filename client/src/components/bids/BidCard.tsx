@@ -2,6 +2,7 @@ import { Card, Avatar, Tag, Button, Typography, Divider, Rate } from "antd";
 import { Bid, BidStatus } from "../../helpers/bids/types";
 import { UserOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useAuthStore } from "../../store/auth.store";
 
 const statusColors: Record<BidStatus, string> = {
     [BidStatus.PENDING]: "blue",
@@ -24,6 +25,7 @@ export default function BidCard({
     onReject,
     onDelete
 }: BidCardProps) {
+    const { user } = useAuthStore();
     return (
         <Card className="w-full" loading={!bid}>
             <div className="flex justify-between w-full items-start">
@@ -47,14 +49,22 @@ export default function BidCard({
 
             <Divider className="my-4" />
 
-            <Typography.Paragraph>
-                {bid.proposal}
-            </Typography.Paragraph>
+            {
+                (isClient || bid.status === BidStatus.ACCEPTED || bid.status === BidStatus.REJECTED) ? (
+                    <Typography.Paragraph>
+                        {bid.proposal}
+                    </Typography.Paragraph>
+                ) : <Typography.Paragraph type="secondary">
+                    You can view the proposal details once the bid is accepted.
+                </Typography.Paragraph>
+            }
 
-            <div className="flex justify-between items-center mt-4">
-                <Typography.Text strong className="text-lg">
-                    ${bid.amount.toLocaleString("en-US")}
-                </Typography.Text>
+            <div className="flex justify-between items-center mt-4">{
+                (isClient || bid.status === BidStatus.ACCEPTED || bid.status === BidStatus.REJECTED) && (
+                    <Typography.Text strong className="text-lg">
+                        ${bid.amount.toLocaleString("en-US")}
+                    </Typography.Text>
+                )}
 
                 <Typography.Text type="secondary">
                     Submitted: {dayjs(bid.createdAt).format("MMM D, YYYY")}
@@ -80,7 +90,7 @@ export default function BidCard({
                 </div>
             )}
 
-            {!isClient && (
+            {!isClient && bid.freelancer.id == user?.id && (
                 <div className="flex justify-end mt-4">
                     <Button
                         danger

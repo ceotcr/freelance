@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule, BidsModule, FilesModule, InvoicesModule, MessagesModule, MilestonesModule, ProjectsModule, SkillsModule, UsersModule } from './exports/modules';
-import { Bid, Invoice, LogoutLog, Message, Milestone, Project, Skill, User, UploadedFile } from './exports/entities';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 import { MulterConfig } from './common/config/multer.config';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { Bid, Invoice, LogoutLog, Message, Milestone, Project, Skill, User, UploadedFile } from './exports/entities';
+import { AuthModule, BidsModule, FilesModule, InvoicesModule, MessagesModule, MilestonesModule, ProjectsModule, SkillsModule, UsersModule } from './exports/modules';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -21,7 +21,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [User, Project, Bid, Milestone, Skill, Invoice, UploadedFile, Message, UploadedFile, LogoutLog],
-    synchronize: true,
+    // synchronize: true,
   }), MulterModule.registerAsync({
     useClass: MulterConfig
   }), UsersModule, ProjectsModule, BidsModule, MilestonesModule, SkillsModule, InvoicesModule, FilesModule, MessagesModule, AuthModule],

@@ -21,11 +21,11 @@ const Hero = () => {
                     Find the perfect freelancer for your project, or showcase your skills and get hired.
                 </p>
                 <br />
-                <span>
+                <span className="text-white  mt-8 mb-2">
                     Register as
                 </span>
 
-                <div className="flex mt-8 gap-4">
+                <div className="flex gap-4">
                     <NavLink to="/register?as=freelancer" className="bg-black hover:text-black text-white px-6 py-3 rounded-4xl hover:bg-white transition duration-300">
                         Freelancer
                     </NavLink>

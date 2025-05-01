@@ -5,17 +5,24 @@ import {
     createProject,
     updateProject,
     deleteProject,
+    getProjects,
 } from "./apis";
 import { UpdateProjectInput } from "./types";
 import { message } from "antd";
 
-export const useProjects = (params?: any) => {
+export const useProjects = (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    orderBy?: "asc" | "desc";
+}) => {
     return useQuery({
-        queryKey: ["client-projects", params],
-        queryFn: () => getMyProjects(params),
+        queryKey: ["projects", params],
+        queryFn: () => getProjects(params),
     });
-};
-
+}
 export const useProject = (id: number) => {
     return useQuery({
         queryKey: ["project", id],

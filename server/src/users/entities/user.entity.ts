@@ -68,4 +68,7 @@ export class User {
 
     @OneToMany(() => LogoutLog, logoutLog => logoutLog.user, { cascade: true })
     logoutLogs: LogoutLog;
+
+    @OneToMany(() => Project, project => project.assignedTo)
+    assignedProjects: Project[];
 }

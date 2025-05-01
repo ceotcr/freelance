@@ -12,6 +12,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -56,6 +57,14 @@ export class ProjectsController {
     return this.projectsService.findMyProjects(paginationDto, user);
   }
 
+  @Get("freelancer-projects")
+  @Roles(UserRole.FREELANCER)
+  findFreelancerProjects(
+    @GetUser() user: User,
+  ) {
+    return this.projectsService.findFreelancerProjects(user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.projectsService.findOne(+id);
@@ -97,8 +106,11 @@ export class ProjectsController {
   }
 
   @Get(':id/files')
-  getFiles(@Param('id') id: string) {
-    return this.projectsService.getProjectFiles(+id);
+  getFiles(@Param('id') id: string, @GetUser() user: User) {
+    if (!user) {
+      throw new UnauthorizedException()
+    }
+    return this.projectsService.getProjectFiles(+id, user.id);
   }
 
   @Post(':id/milestones')

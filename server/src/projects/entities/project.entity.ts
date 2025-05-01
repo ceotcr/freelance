@@ -23,6 +23,9 @@ export class Project {
     @Column({ type: 'enum', enum: ['open', 'in_progress', 'completed', 'cancelled'], default: 'open' })
     status: 'open' | 'in_progress' | 'completed' | 'cancelled';
 
+    @ManyToOne(() => User, user => user.projects, { nullable: true })
+    assignedTo: User;
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     postedAt: Date;
 

@@ -2,15 +2,15 @@ import axiosInstance from "../axios.instance";
 import { Bid } from "../bids/types";
 import { Project } from "../projects/types";
 
-export const getMyBids = async (id: number): Promise<Bid[]> => {
-    const response = await axiosInstance.post(`/bids/my-bids`, { data: { id } });
+export const getMyBids = async (): Promise<Bid[]> => {
+    const response = await axiosInstance.get(`/bids/my-bids`);
     return response.data;
 };
 
 export const getActiveProjects = async (): Promise<Project[]> => {
-    const response = await axiosInstance.get('/bids/my-bids');
-    const activeProjects = response.data.filter((bid: Bid) => bid.status === 'accepted' && bid.project.status === 'in_progress');
-    return activeProjects.map((bid: Bid) => bid.project);
+    const response = await axiosInstance.get('/projects/freelancer-projects');
+    const filteredProjects = response.data.filter((project: Project) => project.status === 'in_progress');
+    return filteredProjects;
 };
 
 export const getRecentSubmissions = async (): Promise<File[]> => {

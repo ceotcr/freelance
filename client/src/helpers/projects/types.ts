@@ -12,7 +12,7 @@ export const ProjectSchema = z.object({
         firstName: z.string(),
         lastName: z.string(),
     }),
-    freelancer: z.object({
+    assignedTo: z.object({
         id: z.number(),
         firstName: z.string(),
         lastName: z.string(),
@@ -23,7 +23,7 @@ export const ProjectSchema = z.object({
             id: z.number(),
             amount: z.number(),
             status: z.enum(["pending", "accepted", "rejected"]),
-            freelancer: z.object({
+            assignedTo: z.object({
                 id: z.number(),
                 firstName: z.string(),
                 lastName: z.string(),

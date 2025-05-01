@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UploadedFile } from './entities/file.entity';
@@ -68,5 +68,26 @@ export class FilesService {
   async remove(id: number): Promise<void> {
     const file = await this.findOne(id);
     await this.fileRepository.remove(file);
+  }
+
+  async findByProjectAndUser(projectId: number, userId: number): Promise<UploadedFile[]> {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['client', 'assignedTo'],
+    });
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (project.client?.id !== user?.id && project.assignedTo?.id !== user?.id) {
+      throw new UnauthorizedException('User is not authorized to access these files');
+    }
+    return this.fileRepository.find({
+      where: { project: { id: projectId } },
+      relations: ['user', 'project'],
+    });
   }
 }

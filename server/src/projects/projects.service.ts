@@ -167,9 +167,9 @@ export class ProjectsService {
     });
   }
 
-  async getProjectFiles(projectId: number): Promise<UploadedFile[]> {
-    await this.findOne(projectId); // Verify project exists
-    return this.filesService.findByProject(projectId);
+  async getProjectFiles(projectId: number, userId: number): Promise<UploadedFile[]> {
+    await this.findOne(projectId);
+    return this.filesService.findByProjectAndUser(projectId, userId);
   }
 
   async getProjectMilestones(projectId: number): Promise<Milestone[]> {
@@ -185,5 +185,16 @@ export class ProjectsService {
   async getProjectBids(projectId: number): Promise<Bid[]> {
     await this.findOne(projectId); // Verify project exists
     return this.bidsService.findByProject(projectId);
+  }
+  async findFreelancerProjects(id: number) {
+    const projects = await this.projectRepository.find({
+      where: { assignedTo: { id } },
+      relations: ['client', 'bids', 'milestones', 'files', 'invoices', 'messages'],
+    });
+
+    if (!projects || projects.length === 0) {
+      throw new NotFoundException(`Projects with freelancer ID ${id} not found`);
+    }
+    return projects;
   }
 }

@@ -178,21 +178,24 @@ export default function ProjectDetailsPage() {
                     isClient={user?.role == "client"}
                     loading={milestonesLoading}
                     clientId={project.client.id}
-                    fid={project.freelancer?.id}
+                    fid={project.assignedTo?.id}
                 />
                 <BidList
                     bids={bids || []}
                     projectId={Number(id)}
-                    isClient={user?.role == "client"}
+                    isClient={user?.role == "client" && project.client.id === user?.id}
                     onAccept={handleAccept}
                     onReject={handleReject}
                     onDelete={handleBidsDelete}
                     loading={bidsLoading}
                 />
-
-                <Card title="Project Files Management">
-                    <FileManagement projectId={Number(id)} />
-                </Card>
+                {
+                    project.assignedTo?.id === user?.id || project.client.id === user?.id && (
+                        <Card title="Project Files Management">
+                            <FileManagement projectId={Number(id)} clientId={project.client.id} fid={project.assignedTo?.id} />
+                        </Card>
+                    )
+                }
             </Space>
         </div>
     );

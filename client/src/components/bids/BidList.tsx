@@ -38,11 +38,6 @@ export default function BidList({
         >
             {bids.length === 0 ? (
                 <Empty description="No bids submitted yet">
-                    {!isClient && (
-                        <Button type="primary">
-                            <Link to={`/projects/${projectId}/bid`}>Be the first to bid</Link>
-                        </Button>
-                    )}
                 </Empty>
             ) : (
                 <List
