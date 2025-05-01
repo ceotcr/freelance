@@ -25,7 +25,7 @@ const Hero = () => {
                 <br />
 
                 <div className="flex gap-4 items-center">
-                    {user ?
+                    {!user ?
                         (
                             <>
                                 <span className="text-white mb-2">
