@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProjectFiles, getUserFiles, uploadFile, deleteFile } from "./api";
-import { File } from "./types";
 
 export const useProjectFiles = (projectId: number) => {
     return useQuery({
@@ -41,6 +40,7 @@ export const useDeleteFile = () => {
         mutationFn: deleteFile,
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["files"] });
+            queryClient.invalidateQueries({ queryKey: ["files", "project", variables] });
         },
     });
 };

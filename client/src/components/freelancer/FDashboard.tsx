@@ -4,12 +4,9 @@ import { useAuthStore } from "../../store/auth.store";
 import { DollarOutlined, FileOutlined, ProjectOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Milestone } from "../../helpers/milestones/types";
-import type { File } from "../../helpers/files/types";
 import type { Bid } from "../../helpers/bids/types";
 import type { Project } from "../../helpers/projects/types";
-import { getProjectFiles } from "../../helpers/files/api";
 import { getMilestones } from "../../helpers/milestones/apis";
-import { getMyProjects } from "../../helpers/projects/apis";
 import { getMyBids } from "../../helpers/freelancer/api";
 import { Link } from "react-router";
 

@@ -1,11 +1,9 @@
 import { Card, Col, Row, Statistic, Tabs, TabsProps, Tag, Typography } from "antd";
-import ProjectsList from "../projects/ProjectList";
 import { useQuery } from "@tanstack/react-query";
 import { getMyProjects } from "../../helpers/projects/apis";
 import { getBids } from "../../helpers/bids/api";
 import { getMilestones } from "../../helpers/milestones/apis";
 import { getProjectFiles } from "../../helpers/files/api";
-import { useAuthStore } from "../../store/auth.store";
 import { DollarOutlined, FileDoneOutlined, FileOutlined, ProjectOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Milestone } from "../../helpers/milestones/types";
@@ -18,7 +16,6 @@ import MyProjectsList from "../projects/MyProjectsList";
 const { Title } = Typography;
 
 const CDashboard = () => {
-    const { user } = useAuthStore();
     const { data: projects } = useQuery({
         queryKey: ["client-projects"],
         queryFn: () => getMyProjects(),

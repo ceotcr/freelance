@@ -19,7 +19,7 @@ export const useCreateMessage = () => {
             const { data } = await api.post('/messages', payload);
             return data;
         },
-        onSuccess: (data, variables) => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['messages', variables.projectId] });
         },
     });

@@ -72,6 +72,7 @@ export default function ProjectDetailsPage() {
         pending: "default",
         in_progress: "processing",
         completed: "success",
+        open: "warning",
     } as const;
 
     const { data: bids, isLoading: bidsLoading } = useBids(Number(id));
@@ -93,8 +94,7 @@ export default function ProjectDetailsPage() {
         );
     };
 
-    const handleReject = (bidId: number) => {
-        message.info("Reject functionality to be implemented");
+    const handleReject = () => {
     };
 
     const handleBidsDelete = (bidId: number) => {

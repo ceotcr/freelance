@@ -12,7 +12,7 @@ interface FileManagementProps {
 
 export default function FileManagement({ projectId, clientId, fid }: FileManagementProps) {
     const { user } = useAuthStore();
-    const { data: files = [], isLoading, refetch } = useProjectFiles(projectId);
+    const { data: files = [], refetch } = useProjectFiles(projectId);
 
     const clientFiles = files.filter(file => file.user.role === "client");
     const freelancerFiles = files.filter(file => file.user.role === "freelancer");

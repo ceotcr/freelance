@@ -1,8 +1,6 @@
 import { Modal, List, Avatar, Form, Input, Button, message as antMessage } from "antd";
 import { useMessages, useCreateMessage } from "../../helpers/messages/hooks";
-import { useAuthStore } from "../../store/auth.store";
 import { UserOutlined } from "@ant-design/icons";
-import { useState } from "react";
 
 interface MessageModalProps {
     projectId: number;
@@ -12,8 +10,7 @@ interface MessageModalProps {
     onCancel: () => void;
 }
 
-export default function MessageModal({ projectId, clientId, freelancerId, open, onCancel }: MessageModalProps) {
-    const { user } = useAuthStore();
+export default function MessageModal({ projectId, open, onCancel }: MessageModalProps) {
     const { data: messages, isLoading } = useMessages(projectId, open);
     const { mutate: createMessage } = useCreateMessage();
     const [form] = Form.useForm();

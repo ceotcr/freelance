@@ -1,4 +1,4 @@
-import { Button, Typography, Card, Input, Select, DatePicker, Row, Col, Space } from "antd";
+import { Button, Typography, Card, Input, Select, Row, Col, Space } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import ProjectsList from "../../components/projects/ProjectList";
