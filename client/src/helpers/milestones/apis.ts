@@ -26,11 +26,11 @@ export const deleteMilestone = async ({ id }: { id: number, projectId: number })
 };
 
 export const completeMilestone = async (id: number): Promise<Milestone> => {
-    const response = await axiosInstance.put(`/milestones/${id}/complete`);
+    const response = await axiosInstance.patch(`/milestones/${id}/`, { status: "completed" });
     return response.data;
 };
 
 export const approveMilestone = async (id: number): Promise<Milestone> => {
-    const response = await axiosInstance.put(`/milestones/${id}/approve`);
+    const response = await axiosInstance.patch(`/milestones/${id}/`, { status: "approved" });
     return response.data;
 };

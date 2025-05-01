@@ -33,7 +33,9 @@ export const useCreateMilestone = () => {
         mutationFn: createMilestone,
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["milestones", data.projectId] });
+            queryClient.invalidateQueries({ queryKey: ["milestone", data.id] });
             queryClient.invalidateQueries({ queryKey: ["project", data.projectId] });
+            queryClient.invalidateQueries({ queryKey: ["invoices", data.projectId] })
         },
     });
 };
@@ -44,10 +46,10 @@ export const useUpdateMilestone = () => {
     return useMutation({
         mutationFn: ({ id, data }: { id: number; data: UpdateMilestoneInput }) =>
             updateMilestone(id, data),
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["milestones", data.projectId] });
-            queryClient.invalidateQueries({ queryKey: ["milestone", data.id] });
-            queryClient.invalidateQueries({ queryKey: ["project", data.projectId] });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["milestones"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["milestone"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["project"], exact: false });
         },
     });
 };
@@ -57,9 +59,10 @@ export const useDeleteMilestone = () => {
 
     return useMutation({
         mutationFn: deleteMilestone,
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ["milestones", variables.projectId] });
-            queryClient.invalidateQueries({ queryKey: ["project", variables.projectId] });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["milestones"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["project"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["invoices"], exact: false });
         },
     });
 };
@@ -69,10 +72,11 @@ export const useCompleteMilestone = () => {
 
     return useMutation({
         mutationFn: completeMilestone,
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["milestones", data.projectId] });
-            queryClient.invalidateQueries({ queryKey: ["milestone", data.id] });
-            queryClient.invalidateQueries({ queryKey: ["project", data.projectId] });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["milestones"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["project"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["invoices"], exact: false });
+            queryClient.invalidateQueries({ queryKey: ["milestone"], exact: false });
         },
     });
 };
