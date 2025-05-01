@@ -13,6 +13,7 @@ import type { File } from "../../helpers/files/types";
 import type { Bid } from "../../helpers/bids/types";
 import type { Project } from "../../helpers/projects/types";
 import { Link } from "react-router";
+import MyProjectsList from "../projects/MyProjectsList";
 
 const { Title } = Typography;
 
@@ -104,7 +105,7 @@ const CDashboard = () => {
         {
             key: '1',
             label: 'My Projects',
-            children: <ProjectsList />,
+            children: <MyProjectsList />,
         },
         {
             key: '2',

@@ -1,8 +1,10 @@
 import BgImage from "../../assets/images/hero-bg.jpg";
 
 import { NavLink } from 'react-router'
+import { useAuthStore } from "../../store/auth.store";
 
 const Hero = () => {
+    const { user } = useAuthStore();
     return (
         <div className="w-[96%] max-w-[1440px] flex py-12 min-h-[400px] p-4 my-4 rounded-3xl bg-cover bg-no-repeat bg-center"
             style={{
@@ -21,18 +23,27 @@ const Hero = () => {
                     Find the perfect freelancer for your project, or showcase your skills and get hired.
                 </p>
                 <br />
-                <span className="text-white  mt-8 mb-2">
-                    Register as
-                </span>
 
-                <div className="flex gap-4">
-                    <NavLink to="/register?as=freelancer" className="bg-black hover:text-black text-white px-6 py-3 rounded-4xl hover:bg-white transition duration-300">
-                        Freelancer
-                    </NavLink>
+                <div className="flex gap-4 items-center">
+                    {user ?
+                        (
+                            <>
+                                <span className="text-white mb-2">
+                                    Register as
+                                </span>
+                                <NavLink to="/register?as=freelancer" className="bg-black hover:text-black text-white px-6 py-3 rounded-4xl hover:bg-white transition duration-300 h-fit">
+                                    Freelancer
+                                </NavLink>
 
-                    <NavLink to="/register?as=client" className="ring hover:ring-0 px-6 py-3 rounded-4xl hover:bg-white hover:text-black text-white transition duration-300">
-                        Client
-                    </NavLink>
+                                <NavLink to="/register?as=client" className="ring hover:ring-0 px-6 py-3 rounded-4xl hover:bg-white hover:text-black text-white transition duration-300 h-fit">
+                                    Client
+                                </NavLink>
+                            </>
+                        ) : (
+                            <NavLink to="/dashboard" className="bg-black hover:text-black text-white px-6 py-3 rounded-4xl hover:bg-white transition duration-300 h-fit">
+                                Go to Dashboard
+                            </NavLink>
+                        )}
                 </div>
             </div>
         </div>

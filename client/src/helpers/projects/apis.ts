@@ -39,8 +39,15 @@ export const getProjects = async (params?: {
     search?: string;
     status?: string;
     sortBy?: string;
-    orderBy?: "asc" | "desc";
-}): Promise<{ data: Project[]; count: number }> => {
+    orderBy?: "ASC" | "DESC";
+}): Promise<{
+    data: Project[]; count: number, meta:
+    {
+        currentPage: number;
+        itemsPerPage: number;
+        totalItems: number;
+    };
+}> => {
     const response = await axiosInstance.get("/projects", { params });
     return response.data;
 }

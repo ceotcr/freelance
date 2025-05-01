@@ -6,7 +6,7 @@ export const ProjectSchema = z.object({
     description: z.string(),
     budget: z.number(),
     postedAt: z.string().datetime(),
-    status: z.enum(["pending", "in_progress", "completed"]),
+    status: z.enum(["open", "in_progress", "completed"]),
     client: z.object({
         id: z.number(),
         firstName: z.string(),

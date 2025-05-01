@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../helpers/axios.instance";
 import { IUser } from "../interfaces/user";
 import { message } from "antd";
+import TopBar from "../components/TopBar";
 
 const MainLayout = () => {
     const { user, setUser } = useAuthStore();
@@ -33,7 +34,12 @@ const MainLayout = () => {
 
     if (loading) return <div>Loading...</div>;
 
-    return <Outlet />;
+    return (
+        <>
+            <TopBar />
+            <Outlet />
+        </>
+    );
 };
 
 export default MainLayout;

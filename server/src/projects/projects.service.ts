@@ -13,7 +13,7 @@ import { User } from '../users/entities/user.entity';
 import { CreateMilestoneDto } from '../milestones/dto/create-milestone.dto';
 import { CreateInvoiceDto } from '../invoices/dto/create-invoice.dto';
 import { Milestone, MilestoneStatus } from '../milestones/entities/milestone.entity';
-import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, ILike, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { Invoice, UploadedFile, Bid } from 'src/exports/entities';
 
 @Injectable()
@@ -34,39 +34,80 @@ export class ProjectsService {
     });
     return await this.projectRepository.save(project);
   }
+  async findAll(
+    paginationDto?: PaginationDto,
+    filterDto?: FilterProjectsDto
+  ) {
+    const { page = 1, limit = 10, sortBy = 'postedAt', sortOrder = 'DESC' } = paginationDto as PaginationDto;
+    const { search, minBudget, maxBudget, startDate, endDate, status } = filterDto as FilterProjectsDto;
 
-  async findAll(paginationDto?: PaginationDto, filterDto?: FilterProjectsDto): Promise<{ data: Project[]; count: number }> {
-    const { page = 1, limit = 10, sortBy = 'postedAt', sortOrder = 'DESC' } = paginationDto || {};
-    const { search, minBudget, maxBudget, startDate, endDate } = filterDto || {};
-
-    const query = this.projectRepository.createQueryBuilder('project')
+    const query = this.projectRepository
+      .createQueryBuilder('project')
       .leftJoinAndSelect('project.client', 'client')
-      .leftJoinAndSelect('project.assignedTo', 'user')
+      .leftJoinAndSelect('project.assignedTo', 'assignedTo')
       .skip((page - 1) * limit)
-      .take(limit)
-      .orderBy(`project.${sortBy}`, sortOrder as 'ASC' | 'DESC');
+      .take(limit);
+
+    // Apply sorting
+    if (['title', 'budget', 'postedAt', 'status'].includes(sortBy)) {
+      query.orderBy(`project.${sortBy}`, sortOrder as 'ASC' | 'DESC');
+    } else {
+      // Default sorting if invalid sortBy provided
+      query.orderBy('project.postedAt', 'DESC');
+    }
 
     if (search) {
-      query.where([
-        { title: Like(`%${search}%`) },
-        { description: Like(`%${search}%`) }
+      query.andWhere([
+        { title: ILike(`%${search}%`) },
+        { description: ILike(`%${search}%`) }
       ]);
     }
 
-    if (minBudget !== undefined && maxBudget !== undefined) {
-      query.andWhere({ budget: Between(minBudget, maxBudget) });
-    } else if (minBudget !== undefined) {
-      query.andWhere({ budget: MoreThanOrEqual(minBudget) });
-    } else if (maxBudget !== undefined) {
-      query.andWhere({ budget: LessThanOrEqual(maxBudget) });
+    if (minBudget !== undefined || maxBudget !== undefined) {
+      if (minBudget !== undefined && maxBudget !== undefined) {
+        query.andWhere('project.budget BETWEEN :minBudget AND :maxBudget', {
+          minBudget,
+          maxBudget
+        });
+      } else if (minBudget !== undefined) {
+        query.andWhere('project.budget >= :minBudget', { minBudget });
+      } else if (maxBudget !== undefined) {
+        query.andWhere('project.budget <= :maxBudget', { maxBudget });
+      }
     }
 
     if (startDate && endDate) {
-      query.andWhere({ postedAt: Between(new Date(startDate), new Date(endDate)) });
+      query.andWhere('project.postedAt BETWEEN :startDate AND :endDate', {
+        startDate: new Date(startDate),
+        endDate: new Date(endDate)
+      });
+    } else if (startDate) {
+      query.andWhere('project.postedAt >= :startDate', {
+        startDate: new Date(startDate)
+      });
+    } else if (endDate) {
+      query.andWhere('project.postedAt <= :endDate', {
+        endDate: new Date(endDate)
+      });
+    }
+
+    if (status) {
+      query.andWhere('project.status = :status', { status });
     }
 
     const [data, count] = await query.getManyAndCount();
-    return { data, count };
+
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      data,
+      meta: {
+        totalItems: count,
+        currentPage: page,
+        itemsPerPage: limit,
+        totalPages,
+      }
+    };
   }
 
   async findMyProjects(paginationDto: PaginationDto, client: User): Promise<{ data: Project[]; count: number }> {

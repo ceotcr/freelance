@@ -41,11 +41,18 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll(
+  async findAll(
     @Query() paginationDto: PaginationDto,
-    @Query() filterDto: FilterProjectsDto,
+    @Query() filterDto: FilterProjectsDto
   ) {
-    return this.projectsService.findAll(paginationDto, filterDto);
+    const validatedPagination = {
+      page: paginationDto.page || 1,
+      limit: paginationDto.limit || 10,
+      sortBy: paginationDto.sortBy || 'postedAt',
+      sortOrder: paginationDto.sortOrder || 'DESC'
+    };
+
+    return this.projectsService.findAll(validatedPagination, filterDto);
   }
 
   @Get('my-projects')

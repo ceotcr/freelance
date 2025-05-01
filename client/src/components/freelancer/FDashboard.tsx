@@ -57,32 +57,12 @@ const FreelancerDashboard = () => {
         enabled: !!activeProjects?.length,
     });
 
-    const { data: myFiles } = useQuery({
-        queryKey: ["freelancer-files", user?.id],
-        queryFn: async () => {
-            if (!user?.id) return [];
-            const projects = await getMyProjects();
-            const allFiles = await Promise.all(
-                projects.data?.map((project: Project) => getProjectFiles(project.id)) || []
-            );
-            return allFiles.flat().filter((file: File) => file.user.id === user.id);
-        },
-        enabled: !!user?.id,
-    });
-
-
     const activeProjectsCount = activeProjects?.length || 0;
-    const pendingBids = myBids?.filter((b: Bid) => b.status === 'pending') || [];
-    const pendingMilestones = myMilestones?.filter((m: Milestone) =>
-        m.status === 'pending' || m.status === 'completed'
-    ) || [];
-    const recentSubmissions = myFiles?.filter((f: File) =>
-        dayjs(f.createdAt).isAfter(dayjs().subtract(7, 'day'))
-    ) || [];
+    const Bids = myBids?.filter((b: Bid) => b.status === 'pending') || [];
 
 
-    const pendingPayments = myMilestones?.filter((m: Milestone) =>
-        m.status === 'approved'
+    const Payments = myMilestones?.filter((m: Milestone) =>
+        m.status === 'paid'
     ).reduce((sum: number, m: Milestone) => sum + m.amount, 0) || 0;
 
     const stats = [
@@ -94,22 +74,22 @@ const FreelancerDashboard = () => {
             tooltip: "Projects you're currently working on"
         },
         {
-            title: "Pending Bids",
-            value: pendingBids.length,
+            title: " Bids",
+            value: Bids.length,
             icon: <FileOutlined />,
             color: "#faad14",
             tooltip: "Bids awaiting client response"
         },
         {
-            title: "Pending Milestones",
-            value: pendingMilestones.length,
+            title: " Milestones",
+            value: myMilestones?.filter((m: Milestone) => m.status === 'pending').length || 0,
             icon: <ClockCircleOutlined />,
             color: "#13c2c2",
             tooltip: "Milestones needing action or approval"
         },
         {
-            title: "Pending Payments",
-            value: pendingPayments,
+            title: " Payment Received",
+            value: Payments,
             icon: <DollarOutlined />,
             color: "#722ed1",
             prefix: "$",
@@ -203,7 +183,7 @@ const FreelancerDashboard = () => {
     return (
         <div className="flex flex-col gap-6 w-[96%] max-w-[1440px] py-8 mx-auto">
             <div className="flex justify-between items-center mb-4">
-                <Title level={2}>Client Dashboard</Title>
+                <Title level={2}>Freelancer Dashboard</Title>
                 <Link to="/projects" className="ant-btn ant-btn-primary">Go to projects</Link>
             </div>
 
@@ -216,9 +196,6 @@ const FreelancerDashboard = () => {
                                 value={stat.value}
                                 prefix={stat.prefix || stat.icon}
                                 valueStyle={{ color: stat.color }}
-                                suffix={stat.tooltip ? (
-                                    <span title={stat.tooltip}>ℹ️</span>
-                                ) : null}
                             />
                         </Card>
                     </Col>
@@ -231,22 +208,6 @@ const FreelancerDashboard = () => {
                 tabBarStyle={{ marginBottom: 24 }}
             />
 
-            <Card title="Recent Submissions">
-                <div className="space-y-4">
-                    {recentSubmissions.slice(0, 5).map((file: File) => (
-                        <div key={file.id} className="flex justify-between items-center p-4 border-b">
-                            <div>
-                                <p className="font-medium">{file.fileName}</p>
-                                <p className="text-sm text-gray-500">
-                                    Submitted to {file.projectId} on {dayjs(file.createdAt).format('MMM D, YYYY')}
-                                </p>
-                            </div>
-                            <Tag color="green">Recent</Tag>
-                        </div>
-                    ))}
-                    {recentSubmissions.length === 0 && <p>No recent submissions</p>}
-                </div>
-            </Card>
         </div>
     );
 };

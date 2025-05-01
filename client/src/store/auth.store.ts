@@ -23,7 +23,7 @@ interface AuthState {
     setUser: (user: User) => void;
     setTokens: (accessToken: string, refreshToken: string) => void;
     updateProfile: (data: Partial<User>) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
     getUser: () => Promise<User | null>;
 }
 
@@ -38,7 +38,10 @@ export const useAuthStore = create<AuthState>()(
             set((state) => ({
                 user: state.user ? { ...state.user, ...data } : null,
             })),
-        logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+        logout: async () => {
+            await axiosInstance.post('auth/logout');
+            set({ user: null, accessToken: null, refreshToken: null });
+        },
         getUser: async () => {
             const user = await axiosInstance.get('auth/me')
             if (user) {

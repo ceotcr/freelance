@@ -16,7 +16,11 @@ export const useProjects = (params?: {
     search?: string;
     status?: string;
     sortBy?: string;
-    orderBy?: "asc" | "desc";
+    orderBy?: "ASC" | "DESC";
+    minBudget?: number;
+    maxBudget?: number;
+    startDate?: string;
+    endDate?: string;
 }) => {
     return useQuery({
         queryKey: ["projects", params],
@@ -71,3 +75,10 @@ export const useDeleteProject = () => {
         },
     });
 };
+
+export const useMyProjects = () => {
+    return useQuery({
+        queryKey: ["my-projects"],
+        queryFn: () => getMyProjects(),
+    });
+}

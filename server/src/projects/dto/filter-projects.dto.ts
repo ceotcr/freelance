@@ -1,4 +1,5 @@
-import { IsOptional, IsString, IsNumber, Min, IsDateString, IsIn } from 'class-validator';
+import { Type } from "class-transformer";
+import { IsOptional, IsString, IsNumber, Min, IsDateString, IsIn } from "class-validator";
 
 export class FilterProjectsDto {
     @IsOptional()
@@ -6,11 +7,13 @@ export class FilterProjectsDto {
     search?: string;
 
     @IsOptional()
+    @Type(() => Number)
     @IsNumber()
     @Min(0)
     minBudget?: number;
 
     @IsOptional()
+    @Type(() => Number)
     @IsNumber()
     @Min(0)
     maxBudget?: number;
@@ -25,6 +28,6 @@ export class FilterProjectsDto {
 
     @IsOptional()
     @IsString()
-    @IsIn(['pending', 'in_progress', 'completed'])
+    @IsIn(['open', 'in_progress', 'completed'])
     status?: string;
 }
