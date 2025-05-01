@@ -30,6 +30,7 @@ const RegisterForm: React.FC = () => {
             axiosInstance.post('/auth/register', data),
         onSuccess: () => {
             message.success('Registration successful!');
+            navigate('/login');
         },
         onError: (error) => {
             message.error(error.message)
