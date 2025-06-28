@@ -4,7 +4,7 @@
 
 ## Requires - PostgreSQL set up
 
-- server setup - view .env.example change credentials (Based on you DB credentials)
+- server setup - view .env.example change credentials (Based on your DB credentials)
 
 click on register buttons in hero section 
 choose role, sigin after register and view your dashboard
